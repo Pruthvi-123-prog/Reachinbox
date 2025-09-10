@@ -1,0 +1,488 @@
+// Search.tsx
+import React, { useState, useEffect } from 'react';
+import { 
+  Box, 
+  Typography, 
+  Card, 
+  CardContent, 
+  TextField, 
+  Button, 
+  FormControl, 
+  InputLabel, 
+  Select, 
+  MenuItem, 
+  Chip, 
+  FormControlLabel, 
+  Checkbox, 
+  CircularProgress, 
+  Alert, 
+  Paper,
+  IconButton,
+  InputAdornment,
+  Divider,
+  SelectChangeEvent,
+} from '@mui/material';
+import { Search as SearchIcon, Clear, FilterList, ArrowUpward, ArrowDownward } from '@mui/icons-material';
+import { useNavigate } from 'react-router-dom';
+import { emailAPI } from '../../services/api';
+import { 
+  useEmailContext, 
+  emailActions, 
+  EmailSearchQuery, 
+  EmailMessage,
+  EmailCategory
+} from '../../context/EmailContext';
+import { format } from 'date-fns';
+
+const Search: React.FC = () => {
+  const navigate = useNavigate();
+  const { state, dispatch } = useEmailContext();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [showAdvancedSearch, setShowAdvancedSearch] = useState(false);
+
+  // Search form state
+  const [searchQuery, setSearchQuery] = useState<EmailSearchQuery>({
+    q: '',
+    account: '',
+    folder: '',
+    category: undefined,
+    sender: '',
+    subject: '',
+    dateFrom: undefined,
+    dateTo: undefined,
+    isRead: undefined,
+    isStarred: undefined,
+    hasAttachments: undefined,
+    page: 1,
+    limit: 20,
+    sortBy: 'date',
+    sortOrder: 'desc'
+  });
+
+  // Handle search form input changes
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setSearchQuery(prev => ({ ...prev, [name]: value }));
+  };
+
+  // Handle select changes
+  const handleSelectChange = (e: SelectChangeEvent<string>) => {
+    const { name, value } = e.target;
+    setSearchQuery(prev => ({ ...prev, [name]: value }));
+  };
+
+  // Handle checkbox changes
+  const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, checked } = e.target;
+    setSearchQuery(prev => ({ ...prev, [name]: checked }));
+  };
+
+  // Handle date changes
+  const handleDateChange = (name: string, value: string) => {
+    setSearchQuery(prev => ({ 
+      ...prev, 
+      [name]: value ? new Date(value) : undefined 
+    }));
+  };
+
+  // Handle sort change
+  const handleSortChange = (field: 'date' | 'sender' | 'subject') => {
+    setSearchQuery(prev => ({
+      ...prev,
+      sortBy: field,
+      sortOrder: prev.sortBy === field && prev.sortOrder === 'desc' ? 'asc' : 'desc'
+    }));
+  };
+
+  // Handle search submission
+  const handleSearch = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      // Update context search query
+      dispatch(emailActions.setSearchQuery(searchQuery));
+      
+      // Execute search
+      const results = await emailAPI.getEmails(searchQuery);
+      
+      // Update context with results
+      dispatch(emailActions.setSearchResults(results));
+      
+      setLoading(false);
+    } catch (err: any) {
+      setError(err.message || 'Failed to search emails');
+      setLoading(false);
+    }
+  };
+
+  // Handle clearing search
+  const handleClearSearch = () => {
+    setSearchQuery({
+      q: '',
+      page: 1,
+      limit: 20,
+      sortBy: 'date',
+      sortOrder: 'desc'
+    });
+    dispatch(emailActions.clearSearch());
+  };
+
+  // Handle viewing an email
+  const handleViewEmail = (email: EmailMessage) => {
+    dispatch(emailActions.setSelectedEmail(email));
+    navigate(`/emails/${email.id}`);
+  };
+
+  // Handle pagination
+  const handlePageChange = (newPage: number) => {
+    setSearchQuery(prev => ({ ...prev, page: newPage }));
+    handleSearch();
+  };
+
+  // Format sender for display
+  const formatSender = (sender: any): string => {
+    if (!sender) return 'Unknown';
+    if (typeof sender === 'string') return sender;
+    return sender.name ? sender.name : sender.address || 'Unknown';
+  };
+
+  return (
+    <Box p={3}>
+      <Typography variant="h4" component="h1" gutterBottom>
+        Advanced Search
+      </Typography>
+      
+      <Card sx={{ mb: 4 }}>
+        <CardContent>
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+            <Box>
+              <TextField
+                fullWidth
+                name="q"
+                label="Search emails"
+                value={searchQuery.q}
+                onChange={handleInputChange}
+                placeholder="Search by keyword, sender, subject..."
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <SearchIcon />
+                    </InputAdornment>
+                  ),
+                  endAdornment: searchQuery.q && (
+                    <InputAdornment position="end">
+                      <IconButton onClick={() => setSearchQuery(prev => ({ ...prev, q: '' }))}>
+                        <Clear />
+                      </IconButton>
+                    </InputAdornment>
+                  )
+                }}
+              />
+            </Box>
+            
+            <Box>
+              <Button 
+                variant="outlined" 
+                startIcon={<FilterList />}
+                onClick={() => setShowAdvancedSearch(!showAdvancedSearch)}
+              >
+                {showAdvancedSearch ? 'Hide Advanced Search' : 'Show Advanced Search'}
+              </Button>
+            </Box>
+            
+            {showAdvancedSearch && (
+              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
+                <Box sx={{ flex: '1 1 calc(50% - 8px)', minWidth: '250px' }}>
+                  <TextField
+                    fullWidth
+                    name="subject"
+                    label="Subject"
+                    value={searchQuery.subject || ''}
+                    onChange={handleInputChange}
+                  />
+                </Box>
+                
+                <Box sx={{ flex: '1 1 calc(50% - 8px)', minWidth: '250px' }}>
+                  <TextField
+                    fullWidth
+                    name="sender"
+                    label="Sender"
+                    value={searchQuery.sender || ''}
+                    onChange={handleInputChange}
+                  />
+                </Box>
+                
+                <Box sx={{ flex: '1 1 calc(50% - 8px)', minWidth: '250px' }}>
+                  <FormControl fullWidth>
+                    <InputLabel>Category</InputLabel>
+                    <Select
+                      name="category"
+                      value={searchQuery.category || ''}
+                      label="Category"
+                      onChange={handleSelectChange}
+                    >
+                      <MenuItem value="">Any</MenuItem>
+                      {Object.values(EmailCategory).map((category) => (
+                        <MenuItem key={category} value={category}>
+                          {category.charAt(0).toUpperCase() + category.slice(1).replace('_', ' ')}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                </Box>
+                
+                <Box sx={{ flex: '1 1 calc(50% - 8px)', minWidth: '250px' }}>
+                  <FormControl fullWidth>
+                    <InputLabel>Folder</InputLabel>
+                    <Select
+                      name="folder"
+                      value={searchQuery.folder || ''}
+                      label="Folder"
+                      onChange={handleSelectChange}
+                    >
+                      <MenuItem value="">Any</MenuItem>
+                      <MenuItem value="INBOX">Inbox</MenuItem>
+                      <MenuItem value="[Gmail]/Sent Mail">Sent</MenuItem>
+                      <MenuItem value="[Gmail]/Drafts">Drafts</MenuItem>
+                      <MenuItem value="[Gmail]/Trash">Trash</MenuItem>
+                      <MenuItem value="[Gmail]/Spam">Spam</MenuItem>
+                    </Select>
+                  </FormControl>
+                </Box>
+                
+                <Box sx={{ flex: '1 1 calc(50% - 8px)', minWidth: '250px' }}>
+                  <TextField
+                    fullWidth
+                    name="dateFrom"
+                    label="From Date"
+                    type="date"
+                    InputLabelProps={{ shrink: true }}
+                    value={searchQuery.dateFrom ? new Date(searchQuery.dateFrom).toISOString().split('T')[0] : ''}
+                    onChange={(e) => handleDateChange('dateFrom', e.target.value)}
+                  />
+                </Box>
+                
+                <Box sx={{ flex: '1 1 calc(50% - 8px)', minWidth: '250px' }}>
+                  <TextField
+                    fullWidth
+                    name="dateTo"
+                    label="To Date"
+                    type="date"
+                    InputLabelProps={{ shrink: true }}
+                    value={searchQuery.dateTo ? new Date(searchQuery.dateTo).toISOString().split('T')[0] : ''}
+                    onChange={(e) => handleDateChange('dateTo', e.target.value)}
+                  />
+                </Box>
+                
+                <Box sx={{ width: '100%' }}>
+                  <Box display="flex" flexWrap="wrap" gap={2}>
+                    <FormControlLabel
+                      control={
+                        <Checkbox
+                          checked={searchQuery.isRead === true}
+                          onChange={() => setSearchQuery(prev => ({ 
+                            ...prev, 
+                            isRead: prev.isRead === true ? undefined : true
+                          }))}
+                        />
+                      }
+                      label="Read"
+                    />
+                    
+                    <FormControlLabel
+                      control={
+                        <Checkbox
+                          checked={searchQuery.isRead === false}
+                          onChange={() => setSearchQuery(prev => ({ 
+                            ...prev, 
+                            isRead: prev.isRead === false ? undefined : false
+                          }))}
+                        />
+                      }
+                      label="Unread"
+                    />
+                    
+                    <FormControlLabel
+                      control={
+                        <Checkbox
+                          checked={searchQuery.isStarred === true}
+                          onChange={() => setSearchQuery(prev => ({ 
+                            ...prev, 
+                            isStarred: prev.isStarred === true ? undefined : true
+                          }))}
+                        />
+                      }
+                      label="Starred"
+                    />
+                    
+                    <FormControlLabel
+                      control={
+                        <Checkbox
+                          checked={searchQuery.hasAttachments === true}
+                          onChange={() => setSearchQuery(prev => ({ 
+                            ...prev, 
+                            hasAttachments: prev.hasAttachments === true ? undefined : true
+                          }))}
+                        />
+                      }
+                      label="Has Attachments"
+                    />
+                  </Box>
+                </Box>
+              </Box>
+            )}
+            
+            <Box>
+              <Box display="flex" gap={2}>
+                <Button 
+                  variant="contained" 
+                  color="primary" 
+                  onClick={handleSearch}
+                  disabled={loading}
+                  startIcon={loading ? <CircularProgress size={20} /> : <SearchIcon />}
+                >
+                  Search
+                </Button>
+                
+                <Button 
+                  variant="outlined" 
+                  onClick={handleClearSearch}
+                  disabled={loading}
+                >
+                  Clear
+                </Button>
+              </Box>
+            </Box>
+          </Box>
+        </CardContent>
+      </Card>
+      
+      {error && (
+        <Alert severity="error" sx={{ mb: 2 }}>
+          {error}
+        </Alert>
+      )}
+      
+      {loading ? (
+        <CircularProgress />
+      ) : state.searchResults ? (
+        <>
+          <Paper sx={{ mb: 2, p: 2 }}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <Typography variant="subtitle1">
+                Found {state.searchResults.total} results
+              </Typography>
+              <Box display="flex" alignItems="center">
+                <Typography variant="body2" mr={1}>Sort by:</Typography>
+                <Button 
+                  size="small" 
+                  onClick={() => handleSortChange('date')}
+                  endIcon={searchQuery.sortBy === 'date' ? 
+                    (searchQuery.sortOrder === 'desc' ? <ArrowDownward fontSize="small" /> : <ArrowUpward fontSize="small" />) : undefined}
+                >
+                  Date
+                </Button>
+                <Button 
+                  size="small" 
+                  onClick={() => handleSortChange('sender')}
+                  endIcon={searchQuery.sortBy === 'sender' ? 
+                    (searchQuery.sortOrder === 'desc' ? <ArrowDownward fontSize="small" /> : <ArrowUpward fontSize="small" />) : undefined}
+                >
+                  Sender
+                </Button>
+                <Button 
+                  size="small" 
+                  onClick={() => handleSortChange('subject')}
+                  endIcon={searchQuery.sortBy === 'subject' ? 
+                    (searchQuery.sortOrder === 'desc' ? <ArrowDownward fontSize="small" /> : <ArrowUpward fontSize="small" />) : undefined}
+                >
+                  Subject
+                </Button>
+              </Box>
+            </Box>
+          </Paper>
+          
+          {state.searchResults.emails.length > 0 ? (
+            <Box>
+              {state.searchResults.emails.map(email => (
+                <Card key={email.id} sx={{ mb: 1, cursor: 'pointer' }} onClick={() => handleViewEmail(email)}>
+                  <CardContent sx={{ 
+                    p: 2, 
+                    '&:last-child': { pb: 2 },
+                    backgroundColor: email.isRead ? 'inherit' : 'action.hover'
+                  }}>
+                    <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, gap: 1 }}>
+                      <Box sx={{ width: { xs: '100%', sm: '25%' } }}>
+                        <Typography variant="subtitle2" color="text.secondary">
+                          {formatSender(email.sender)}
+                        </Typography>
+                      </Box>
+                      
+                      <Box sx={{ width: { xs: '100%', sm: '50%' } }}>
+                        <Box display="flex" alignItems="center">
+                          {email.isStarred && (
+                            <Chip 
+                              label="Starred" 
+                              size="small" 
+                              color="warning" 
+                              sx={{ mr: 1 }} 
+                            />
+                          )}
+                          <Typography 
+                            variant="body1" 
+                            fontWeight={email.isRead ? 'normal' : 'bold'}
+                          >
+                            {email.subject || '(No Subject)'}
+                          </Typography>
+                        </Box>
+                      </Box>
+                      
+                      <Box sx={{ width: { xs: '100%', sm: '25%' }, textAlign: { xs: 'left', sm: 'right' } }}>
+                        <Typography variant="body2" color="text.secondary">
+                          {format(new Date(email.date), 'MMM d, yyyy')}
+                        </Typography>
+                        {email.category && (
+                          <Chip 
+                            label={email.category} 
+                            size="small" 
+                            sx={{ mt: 0.5 }} 
+                          />
+                        )}
+                      </Box>
+                    </Box>
+                  </CardContent>
+                </Card>
+              ))}
+              
+              <Box display="flex" justifyContent="center" mt={3}>
+                <Button 
+                  disabled={!state.searchResults.hasPrevPage} 
+                  onClick={() => handlePageChange(state.searchResults!.page - 1)}
+                >
+                  Previous
+                </Button>
+                <Typography variant="body1" sx={{ mx: 2 }}>
+                  Page {state.searchResults.page} of {state.searchResults.totalPages}
+                </Typography>
+                <Button 
+                  disabled={!state.searchResults.hasNextPage} 
+                  onClick={() => handlePageChange(state.searchResults!.page + 1)}
+                >
+                  Next
+                </Button>
+              </Box>
+            </Box>
+          ) : (
+            <Alert severity="info">
+              No emails found matching your search criteria. Try adjusting your search terms.
+            </Alert>
+          )}
+        </>
+      ) : null}
+    </Box>
+  );
+};
+
+export default Search;

@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Email Categorization with Puter.js</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+      line-height: 1.5;
+      color: #333;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    .container {
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+    h1 {
+      color: #333;
+    }
+    textarea {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 14px;
+      font-family: inherit;
+      box-sizing: border-box;
+      margin-bottom: 10px;
+    }
+    button {
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: background-color 0.3s;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+    button:disabled {
+      background-color: #cccccc;
+      cursor: not-allowed;
+    }
+    .loading {
+      display: inline-block;
+      margin-left: 10px;
+      vertical-align: middle;
+    }
+    .loading:after {
+      content: " ";
+      display: block;
+      width: 20px;
+      height: 20px;
+      margin: 0;
+      border-radius: 50%;
+      border: 3px solid #fff;
+      border-color: #333 transparent #333 transparent;
+      animation: loading 1.2s linear infinite;
+    }
+    @keyframes loading {
+      0% {
+        transform: rotate(0deg);
+      }
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+    #result {
+      background-color: #f9f9f9;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      padding: 10px;
+      white-space: pre-wrap;
+      font-family: monospace;
+      margin-top: 20px;
+    }
+    .card {
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      padding: 15px;
+      margin-bottom: 15px;
+      background-color: #fff;
+    }
+    .card h3 {
+      margin-top: 0;
+      color: #4CAF50;
+    }
+    .hidden {
+      display: none;
+    }
+    .status {
+      padding: 10px;
+      border-radius: 4px;
+      margin-bottom: 10px;
+    }
+    .status.success {
+      background-color: #d4edda;
+      border: 1px solid #c3e6cb;
+      color: #155724;
+    }
+    .status.error {
+      background-color: #f8d7da;
+      border: 1px solid #f5c6cb;
+      color: #721c24;
+    }
+    .status.info {
+      background-color: #d1ecf1;
+      border: 1px solid #bee5eb;
+      color: #0c5460;
+    }
+  </style>
+</head>
+<body>
+  <h1>Email Categorization with Puter.js</h1>
+  <p>This demo shows how to use Puter.js to categorize emails and suggest replies without any API keys.</p>
+  
+  <div class="status info">
+    <strong>How it works:</strong> This page uses <a href="https://js.puter.com/v2/" target="_blank">Puter.js</a> to access DeepSeek AI models directly from your browser. No API keys or backend required!
+  </div>
+  
+  <div id="puterStatus" class="status"></div>
+  
+  <div class="container">
+    <h2>Test Email</h2>
+    <div>
+      <label for="emailSubject">Subject:</label>
+      <input type="text" id="emailSubject" style="width: 100%; padding: 8px; margin-bottom: 10px;" value="Re: Meeting request for next week">
+    </div>
+    <div>
+      <label for="emailFrom">From:</label>
+      <input type="text" id="emailFrom" style="width: 100%; padding: 8px; margin-bottom: 10px;" value="john.doe@example.com">
+    </div>
+    <div>
+      <label for="emailBody">Email Body:</label>
+      <textarea id="emailBody" rows="8">Hello,
+
+Thank you for reaching out about the meeting. I'm available next Tuesday at 2pm or Wednesday at 10am. Please let me know which time works best for you.
+
+Looking forward to discussing the project further.
+
+Best regards,
+John Doe
+</textarea>
+    </div>
+    
+    <button id="categorizeBtn" onclick="categorizeEmail()">Categorize Email</button>
+    <div id="loadingIndicator" class="loading hidden"></div>
+  </div>
+  
+  <div id="resultContainer" class="hidden">
+    <h2>Results</h2>
+    
+    <div class="card">
+      <h3>Email Category</h3>
+      <div id="categoryResult"></div>
+      <div id="reasoning" style="margin-top: 10px; font-style: italic;"></div>
+    </div>
+    
+    <h3>Suggested Replies</h3>
+    <div id="repliesContainer"></div>
+  </div>
+  
+  <div id="rawResult" class="hidden">
+    <h3>Raw Response</h3>
+    <pre id="result"></pre>
+  </div>
+  
+  <script src="https://js.puter.com/v2/"></script>
+  <script>
+    // Show Puter.js status
+    function updatePuterStatus() {
+      const statusElement = document.getElementById('puterStatus');
+      if (window.puter && window.puter.ai) {
+        statusElement.className = 'status success';
+        statusElement.innerHTML = '<strong>✅ Puter.js detected!</strong> DeepSeek AI models are available for use.';
+      } else {
+        statusElement.className = 'status error';
+        statusElement.innerHTML = '<strong>❌ Puter.js not available.</strong> Please check your connection or try a different browser.';
+      }
+    }
+    
+    // Wait for Puter.js to load
+    window.addEventListener('load', () => {
+      setTimeout(updatePuterStatus, 500);
+    });
+    
+    // Categorize email function
+    async function categorizeEmail() {
+      // Get form values
+      const subject = document.getElementById('emailSubject').value;
+      const from = document.getElementById('emailFrom').value;
+      const body = document.getElementById('emailBody').value;
+      
+      // Show loading indicator
+      document.getElementById('loadingIndicator').classList.remove('hidden');
+      document.getElementById('categorizeBtn').disabled = true;
+      
+      // Check if Puter.js is available
+      if (!window.puter || !window.puter.ai) {
+        alert('Puter.js is not available. Please check your connection.');
+        document.getElementById('loadingIndicator').classList.add('hidden');
+        document.getElementById('categorizeBtn').disabled = false;
+        return;
+      }
+      
+      try {
+        // Create prompt for categorization
+        const prompt = `
+I need you to analyze this email and determine the category from the following options: Interested, Meeting Booked, Not Interested, Spam, Out of Office.
+Also, generate 3 different reply suggestions for this email.
+
+Email:
+From: ${from}
+Subject: ${subject}
+Body:
+${body}
+
+Return the result in the following JSON format exactly:
+{
+  "category": "one of the categories",
+  "reasoning": "brief explanation for the categorization",
+  "replies": [
+    {"subject": "Re: ${subject}", "body": "first reply suggestion"},
+    {"subject": "Re: ${subject}", "body": "second reply suggestion"},
+    {"subject": "Re: ${subject}", "body": "third reply suggestion"}
+  ]
+}
+`;
+        
+        // Call DeepSeek via Puter.js
+        const response = await window.puter.ai.chat(prompt, {
+          model: 'deepseek-reasoner',
+          stream: false
+        });
+        
+        // Process the response
+        const content = response.message.content;
+        document.getElementById('result').textContent = content;
+        
+        // Find JSON in the response
+        const jsonMatch = content.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+          try {
+            const result = JSON.parse(jsonMatch[0]);
+            displayResults(result);
+          } catch (jsonError) {
+            console.error('Error parsing JSON:', jsonError);
+            alert('Error parsing AI response. Check the raw output for details.');
+          }
+        } else {
+          alert('Could not find a valid JSON response from the AI.');
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        alert('An error occurred: ' + error.message);
+      } finally {
+        // Hide loading indicator
+        document.getElementById('loadingIndicator').classList.add('hidden');
+        document.getElementById('categorizeBtn').disabled = false;
+        document.getElementById('rawResult').classList.remove('hidden');
+      }
+    }
+    
+    // Display results in the UI
+    function displayResults(result) {
+      // Show result container
+      document.getElementById('resultContainer').classList.remove('hidden');
+      
+      // Display category
+      document.getElementById('categoryResult').textContent = result.category;
+      document.getElementById('reasoning').textContent = result.reasoning;
+      
+      // Display replies
+      const repliesContainer = document.getElementById('repliesContainer');
+      repliesContainer.innerHTML = '';
+      
+      if (result.replies && Array.isArray(result.replies)) {
+        result.replies.forEach((reply, index) => {
+          const card = document.createElement('div');
+          card.className = 'card';
+          
+          const heading = document.createElement('h4');
+          heading.textContent = `Reply Option ${index + 1}`;
+          card.appendChild(heading);
+          
+          const subject = document.createElement('div');
+          subject.innerHTML = `<strong>Subject:</strong> ${reply.subject}`;
+          card.appendChild(subject);
+          
+          const body = document.createElement('div');
+          body.style.whiteSpace = 'pre-wrap';
+          body.style.marginTop = '10px';
+          body.innerHTML = `<strong>Body:</strong><br>${reply.body.replace(/\n/g, '<br>')}`;
+          card.appendChild(body);
+          
+          const copyBtn = document.createElement('button');
+          copyBtn.textContent = 'Copy Text';
+          copyBtn.style.marginTop = '10px';
+          copyBtn.style.backgroundColor = '#2196F3';
+          copyBtn.onclick = function() {
+            navigator.clipboard.writeText(reply.body).then(
+              function() {
+                copyBtn.textContent = 'Copied!';
+                setTimeout(() => {
+                  copyBtn.textContent = 'Copy Text';
+                }, 2000);
+              }, 
+              function() {
+                alert('Failed to copy text');
+              }
+            );
+          };
+          card.appendChild(copyBtn);
+          
+          repliesContainer.appendChild(card);
+        });
+      } else {
+        repliesContainer.textContent = 'No replies were generated.';
+      }
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,215 @@
+025 at 2:15 AM
+live
+46cdf1f
+Fix CORS issues and Elasticsearch timeout handling
+
+Application logs
+Search
+Search
+
+Sep 9, 2:14 AM - 2:21 AM
+GMT+5:30
+
+Menu
+
+    at Parser._resTagged (/app/node_modules/imap/lib/Parser.js:175:10)
+    at Parser._parse (/app/node_modules/imap/lib/Parser.js:139:16)
+error: Failed to sync recent emails for account account1: Cannot read properties of null (reading 'length') {"service":"reachinbox-backend","stack":"TypeError: Cannot read properties of null (reading 'length')\n    at buildSearchQuery (/app/node_modules/imap/lib/Connection.js:1873:16)\n    at Connection._search (/app/node_modules/imap/lib/Connection.js:577:15)\n    at Connection.search (/app/node_modules/imap/lib/Connection.js:566:8)\n    at /app/dist/services/emailSyncService.js:361:30\n    at Connection.<anonymous> (/app/node_modules/imap/lib/Connection.js:432:7)\n    at Connection._resTagged (/app/node_modules/imap/lib/Connection.js:1535:22)\n    at Parser.<anonymous> (/app/node_modules/imap/lib/Connection.js:194:10)\n    at Parser.emit (node:events:517:28)\n    at Parser._resTagged (/app/node_modules/imap/lib/Parser.js:175:10)\n    at Parser._parse (/app/node_modules/imap/lib/Parser.js:139:16)","timestamp":"2025-09-08 20:50:27"}
+2025-09-08 20:50:31 [error]: Failed to get email stats: connect ECONNREFUSED ::1:9200
+ConnectionError: connect ECONNREFUSED ::1:9200
+    at SniffingTransport._request (/app/node_modules/@elastic/transport/lib/Transport.js:610:31)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async /app/node_modules/@elastic/transport/lib/Transport.js:670:32
+    at async SniffingTransport.request (/app/node_modules/@elastic/transport/lib/Transport.js:666:20)
+    at async Client.SearchApi [as search] (/app/node_modules/@elastic/elasticsearch/lib/api/api/search.js:73:12)
+    at async ElasticsearchService.getEmailStats (/app/dist/services/elasticsearchService.js:356:30)
+error: Failed to get email stats: connect ECONNREFUSED ::1:9200 {"meta":{"headers":{},"meta":{"aborted":false,"attempts":3,"connection":{"_openRequests":0,"deadCount":0,"headers":{"user-agent":"elasticsearch-js/8.19.1 (linux 6.8.0-1029-aws-x64; Node.js 18.20.8; Transport 8.10.0)","x-elastic-client-meta":"es=8.19.1,js=18.20.8,t=8.10.0,un=18.20.8"},"id":"http://localhost:9200/","maxEventListeners":100,"pool":{"_events":{},"_eventsCount":1},"resurrectTimeout":0,"timeout":30000,"tls":null,"url":"http://localhost:9200/","weight":1000},"context":null,"name":"elasticsearch-js","request":{"id":2,"options":{},"params":{"body":"{\"size\":0,\"aggs\":{\"by_account\":{\"terms\":{\"field\":\"account\"}},\"by_category\":{\"terms\":{\"field\":\"category\"}},\"by_folder\":{\"terms\":{\"field\":\"folder\"}}}}","headers":{"accept":"application/vnd.elasticsearch+json; compatible-with=8","content-length":"148","content-type":"application/vnd.elasticsearch+json; compatible-with=8","user-agent":"elasticsearch-js/8.19.1 (linux 6.8.0-1029-aws-x64; Node.js 18.20.8; Transport 8.10.0)","x-elastic-client-meta":"es=8.19.1,js=18.20.8,t=8.10.0,un=18.20.8"},"method":"POST","path":"/reachinbox_emails/_search","querystring":""}}},"statusCode":0,"warnings":null},"name":"ConnectionError","options":{"redaction":{"additionalKeys":[],"type":"replace"}},"service":"reachinbox-backend","stack":"ConnectionError: connect ECONNREFUSED ::1:9200\n    at SniffingTransport._request (/app/node_modules/@elastic/transport/lib/Transport.js:610:31)\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n    at async /app/node_modules/@elastic/transport/lib/Transport.js:670:32\n    at async SniffingTransport.request (/app/node_modules/@elastic/transport/lib/Transport.js:666:20)\n    at async Client.SearchApi [as search] (/app/node_modules/@elastic/elasticsearch/lib/api/api/search.js:73:12)\n    at async ElasticsearchService.getEmailStats (/app/dist/services/elasticsearchService.js:356:30)","timestamp":"2025-09-08 20:50:31"}
+2025-09-08 20:50:33 [info]: Manual sync requested for account: all, force: false
+info: Manual sync requested for account: all, force: false {"service":"reachinbox-backend","timestamp":"2025-09-08 20:50:33"}
+2025-09-08 20:50:33 [info]: Manual email sync triggered
+info: Manual email sync triggered {"service":"reachinbox-backend","timestamp":"2025-09-08 20:50:33"}
+2025-09-08 20:50:33 [info]: ::1 - - [08/Sep/2025:20:50:33 +0000] "POST /api/emails/sync HTTP/1.1" 200 98 "https://imap-8jyext297-pruthvi-123-progs-projects.vercel.app/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+info: ::1 - - [08/Sep/2025:20:50:33 +0000] "POST /api/emails/sync HTTP/1.1" 200 98 "https://imap-8jyext297-pruthvi-123-progs-projects.vercel.app/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36" {"service":"reachinbox-backend","timestamp":"2025-09-08 20:50:33"}
+2025-09-08 20:50:34 [info]: Force syncing latest emails for account account2 since 2025-09-05
+info: Force syncing latest emails for account account2 since 2025-09-05 {"service":"reachinbox-backend","timestamp":"2025-09-08 20:50:34"}
+2025-09-08 20:50:34 [error]: Error in sync process for account account2: Incorrect number of arguments for search option: SINCE
+Error: Incorrect number of arguments for search option: SINCE
+    at buildSearchQuery (/app/node_modules/imap/lib/Connection.js:1928:19)
+    at Connection._search (/app/node_modules/imap/lib/Connection.js:577:15)
+    at Connection.search (/app/node_modules/imap/lib/Connection.js:566:8)
+    at /app/dist/services/emailSyncService.js:725:30
+    at Connection.<anonymous> (/app/node_modules/imap/lib/Connection.js:432:7)
+    at Connection._resTagged (/app/node_modules/imap/lib/Connection.js:1535:22)
+    at Parser.<anonymous> (/app/node_modules/imap/lib/Connection.js:194:10)
+    at Parser.emit (node:events:517:28)
+    at Parser._resTagged (/app/node_modules/imap/lib/Parser.js:175:10)
+    at Parser._parse (/app/node_modules/imap/lib/Parser.js:139:16)
+error: Error in sync process for account account2: Incorrect number of arguments for search option: SINCE {"service":"reachinbox-backend","stack":"Error: Incorrect number of arguments for search option: SINCE\n    at buildSearchQuery (/app/node_modules/imap/lib/Connection.js:1928:19)\n    at Connection._search (/app/node_modules/imap/lib/Connection.js:577:15)\n    at Connection.search (/app/node_modules/imap/lib/Connection.js:566:8)\n    at /app/dist/services/emailSyncService.js:725:30\n    at Connection.<anonymous> (/app/node_modules/imap/lib/Connection.js:432:7)\n    at Connection._resTagged (/app/node_modules/imap/lib/Connection.js:1535:22)\n    at Parser.<anonymous> (/app/node_modules/imap/lib/Connection.js:194:10)\n    at Parser.emit (node:events:517:28)\n    at Parser._resTagged (/app/node_modules/imap/lib/Parser.js:175:10)\n    at Parser._parse (/app/node_modules/imap/lib/Parser.js:139:16)","timestamp":"2025-09-08 20:50:34"}
+2025-09-08 20:50:34 [warn]: Elasticsearch is not available, returning empty search results
+warn: Elasticsearch is not available, returning empty search results {"service":"reachinbox-backend","timestamp":"2025-09-08 20:50:34"}
+2025-09-08 20:50:34 [info]: ::1 - - [08/Sep/2025:20:50:34 +0000] "GET /api/emails?limit=10&sort=date&order=desc HTTP/1.1" 200 187 "https://imap-8jyext297-pruthvi-123-progs-projects.vercel.app/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+info: ::1 - - [08/Sep/2025:20:50:34 +0000] "GET /api/emails?limit=10&sort=date&order=desc HTTP/1.1" 200 187 "https://imap-8jyext297-pruthvi-123-progs-projects.vercel.app/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36" {"service":"reachinbox-backend","timestamp":"2025-09-08 20:50:34"}
+2025-09-08 20:50:34 [info]: ::1 - - [08/Sep/2025:20:50:34 +0000] "GET /api/emails/sync/status HTTP/1.1" 200 433 "https://imap-8jyext297-pruthvi-123-progs-projects.vercel.app/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+info: ::1 - - [08/Sep/2025:20:50:34 +0000] "GET /api/emails/sync/status HTTP/1.1" 200 433 "https://imap-8jyext297-pruthvi-123-progs-projects.vercel.app/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36" {"service":"reachinbox-backend","timestamp":"2025-09-08 20:50:34"}
+2025-09-08 20:50:35 [info]: Force syncing latest emails for account account1 since 2025-09-05
+info: Force syncing latest emails for account account1 since 2025-09-05 {"service":"reachinbox-backend","timestamp":"2025-09-08 20:50:35"}
+2025-09-08 20:50:35 [error]: Error in sync process for account account1: Incorrect number of arguments for search option: SINCE
+Error: Incorrect number of arguments for search option: SINCE
+    at buildSearchQuery (/app/node_modules/imap/lib/Connection.js:1928:19)
+    at Connection._search (/app/node_modules/imap/lib/Connection.js:577:15)
+    at Connection.search (/app/node_modules/imap/lib/Connection.js:566:8)
+    at /app/dist/services/emailSyncService.js:725:30
+    at Connection.<anonymous> (/app/node_modules/imap/lib/Connection.js:432:7)
+    at Connection._resTagged (/app/node_modules/imap/lib/Connection.js:1535:22)
+    at Parser.<anonymous> (/app/node_modules/imap/lib/Connection.js:194:10)
+    at Parser.emit (node:events:517:28)
+    at Parser._resTagged (/app/node_modules/imap/lib/Parser.js:175:10)
+    at Parser._parse (/app/node_modules/imap/lib/Parser.js:139:16)
+error: Error in sync process for account account1: Incorrect number of arguments for search option: SINCE {"service":"reachinbox-backend","stack":"Error: Incorrect number of arguments for search option: SINCE\n    at buildSearchQuery (/app/node_modules/imap/lib/Connection.js:1928:19)\n    at Connection._search (/app/node_modules/imap/lib/Connection.js:577:15)\n    at Connection.search (/app/node_modules/imap/lib/Connection.js:566:8)\n    at /app/dist/services/emailSyncService.js:725:30\n    at Connection.<anonymous> (/app/node_modules/imap/lib/Connection.js:432:7)\n    at Connection._resTagged (/app/node_modules/imap/lib/Connection.js:1535:22)\n    at Parser.<anonymous> (/app/node_modules/imap/lib/Connection.js:194:10)\n    at Parser.emit (node:events:517:28)\n    at Parser._resTagged (/app/node_modules/imap/lib/Parser.js:175:10)\n    at Parser._parse (/app/node_modules/imap/lib/Parser.js:139:16)","timestamp":"2025-09-08 20:50:35"}
+2025-09-08 20:50:35 [info]: Manual email sync completed
+info: Manual email sync completed {"service":"reachinbox-backend","timestamp":"2025-09-08 20:50:35"}
+2025-09-08 20:50:35 [info]: Background sync completed for account: all
+info: Background sync completed for account: all {"service":"reachinbox-backend","timestamp":"2025-09-08 20:50:35"}
+
+2025-09-08 20:50:36 [info]: ::1 - - [08/Sep/2025:20:50:36 +0000] "GET /api/emails/sync/status HTTP/1.1" 304 - "https://imap-8jyext297-pruthvi-123-progs-projects.vercel.app/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+info: ::1 - - [08/Sep/2025:20:50:36 +0000] "GET /api/emails/sync/status HTTP/1.1" 304 - "https://imap-8jyext297-pruthvi-123-progs-projects.vercel.app/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36" {"service":"reachinbox-backend","timestamp":"2025-09-08 20:50:36"}
+2025-09-08 20:50:37 [warn]: Using mock data for email stats:
+warn: Using mock data for email stats: {"service":"reachinbox-backend","timestamp":"2025-09-08 20:50:37"}
+2025-09-08 20:50:37 [info]: ::1 - - [08/Sep/2025:20:50:37 +0000] "GET /api/emails/stats/overview HTTP/1.1" 200 684 "https://imap-8jyext297-pruthvi-123-progs-projects.vercel.app/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+info: ::1 - - [08/Sep/2025:20:50:37 +0000] "GET /api/emails/stats/overview HTTP/1.1" 200 684 "https://imap-8jyext297-pruthvi-123-progs-projects.vercel.app/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36" {"service":"reachinbox-backend","timestamp":"2025-09-08 20:50:37"}
+2025-09-08 20:50:41 [error]: Failed to get email stats: connect ECONNREFUSED ::1:9200
+ConnectionError: connect ECONNREFUSED ::1:9200
+    at SniffingTransport._request (/app/node_modules/@elastic/transport/lib/Transport.js:610:31)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async /app/node_modules/@elastic/transport/lib/Transport.js:670:32
+    at async SniffingTransport.request (/app/node_modules/@elastic/transport/lib/Transport.js:666:20)
+    at async Client.SearchApi [as search] (/app/node_modules/@elastic/elasticsearch/lib/api/api/search.js:73:12)
+    at async ElasticsearchService.getEmailStats (/app/dist/services/elasticsearchService.js:356:30)
+error: Failed to get email stats: connect ECONNREFUSED ::1:9200 {"meta":{"headers":{},"meta":{"aborted":false,"attempts":3,"connection":{"_openRequests":0,"deadCount":0,"headers":{"user-agent":"elasticsearch-js/8.19.1 (linux 6.8.0-1029-aws-x64; Node.js 18.20.8; Transport 8.10.0)","x-elastic-client-meta":"es=8.19.1,js=18.20.8,t=8.10.0,un=18.20.8"},"id":"http://localhost:9200/","maxEventListeners":100,"pool":{"_events":{},"_eventsCount":1},"resurrectTimeout":0,"timeout":30000,"tls":null,"url":"http://localhost:9200/","weight":1000},"context":null,"name":"elasticsearch-js","request":{"id":3,"options":{},"params":{"body":"{\"size\":0,\"aggs\":{\"by_account\":{\"terms\":{\"field\":\"account\"}},\"by_category\":{\"terms\":{\"field\":\"category\"}},\"by_folder\":{\"terms\":{\"field\":\"folder\"}}}}","headers":{"accept":"application/vnd.elasticsearch+json; compatible-with=8","content-length":"148","content-type":"application/vnd.elasticsearch+json; compatible-with=8","user-agent":"elasticsearch-js/8.19.1 (linux 6.8.0-1029-aws-x64; Node.js 18.20.8; Transport 8.10.0)","x-elastic-client-meta":"es=8.19.1,js=18.20.8,t=8.10.0,un=18.20.8"},"method":"POST","path":"/reachinbox_emails/_search","querystring":""}}},"statusCode":0,"warnings":null},"name":"ConnectionError","options":{"redaction":{"additionalKeys":[],"type":"replace"}},"service":"reachinbox-backend","stack":"ConnectionError: connect ECONNREFUSED ::1:9200\n    at SniffingTransport._request (/app/node_modules/@elastic/transport/lib/Transport.js:610:31)\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n    at async /app/node_modules/@elastic/transport/lib/Transport.js:670:32\n    at async SniffingTransport.request (/app/node_modules/@elastic/transport/lib/Transport.js:666:20)\n    at async Client.SearchApi [as search] (/app/node_modules/@elastic/elasticsearch/lib/api/api/search.js:73:12)\n    at async ElasticsearchService.getEmailStats (/app/dist/services/elasticsearchService.js:356:30)","timestamp":"2025-09-08 20:50:41"}
+2025-09-08 20:50:45 [warn]: Elasticsearch is not available, returning empty search results
+warn: Elasticsearch is not available, returning empty search results {"service":"reachinbox-backend","timestamp":"2025-09-08 20:50:45"}
+2025-09-08 20:50:45 [info]: ::1 - - [08/Sep/2025:20:50:45 +0000] "GET /api/emails?limit=100&sort=date&order=desc HTTP/1.1" 200 188 "https://imap-8jyext297-pruthvi-123-progs-projects.vercel.app/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+info: ::1 - - [08/Sep/2025:20:50:45 +0000] "GET /api/emails?limit=100&sort=date&order=desc HTTP/1.1" 200 188 "https://imap-8jyext297-pruthvi-123-progs-projects.vercel.app/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36" {"service":"reachinbox-backend","timestamp":"2025-09-08 20:50:45"}
+2025-09-08 20:50:48 [info]: ::1 - - [08/Sep/2025:20:50:48 +0000] "GET /api/emails/sync/status HTTP/1.1" 304 - "https://imap-8jyext297-pruthvi-123-progs-projects.vercel.app/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+info: ::1 - - [08/Sep/2025:20:50:48 +0000] "GET /api/emails/sync/status HTTP/1.1" 304 - "https://imap-8jyext297-pruthvi-123-progs-projects.vercel.app/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36" {"service":"reachinbox-backend","timestamp":"2025-09-08 20:50:48"}
+2025-09-08 20:50:48 [warn]: Elasticsearch is not available, returning empty search results
+warn: Elasticsearch is not available, returning empty search results {"service":"reachinbox-backend","timestamp":"2025-09-08 20:50:48"}
+2025-09-08 20:50:48 [info]: ::1 - - [08/Sep/2025:20:50:48 +0000] "GET /api/emails?limit=10&sort=date&order=desc HTTP/1.1" 304 - "https://imap-8jyext297-pruthvi-123-progs-projects.vercel.app/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+info: ::1 - - [08/Sep/2025:20:50:48 +0000] "GET /api/emails?limit=10&sort=date&order=desc HTTP/1.1" 304 - "https://imap-8jyext297-pruthvi-123-progs-projects.vercel.app/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36" {"service":"reachinbox-backend","timestamp":"2025-09-08 20:50:48"}
+2025-09-08 20:50:51 [warn]: Using mock data for email stats:
+warn: Using mock data for email stats: {"service":"reachinbox-backend","timestamp":"2025-09-08 20:50:51"}
+2025-09-08 20:50:51 [info]: ::1 - - [08/Sep/2025:20:50:51 +0000] "GET /api/emails/stats/overview HTTP/1.1" 200 684 "https://imap-8jyext297-pruthvi-123-progs-projects.vercel.app/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+info: ::1 - - [08/Sep/2025:20:50:51 +0000] "GET /api/emails/stats/overview HTTP/1.1" 200 684 "https://imap-8jyext297-pruthvi-123-progs-projects.vercel.app/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36" {"service":"reachinbox-backend","timestamp":"2025-09-08 20:50:51"}
+2025-09-08 20:50:55 [error]: Failed to get email stats: connect ECONNREFUSED ::1:9200
+ConnectionError: connect ECONNREFUSED ::1:9200
+    at SniffingTransport._request (/app/node_modules/@elastic/transport/lib/Transport.js:610:31)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async /app/node_modules/@elastic/transport/lib/Transport.js:670:32
+    at async SniffingTransport.request (/app/node_modules/@elastic/transport/lib/Transport.js:666:20)
+    at async Client.SearchApi [as search] (/app/node_modules/@elastic/elasticsearch/lib/api/api/search.js:73:12)
+    at async ElasticsearchService.getEmailStats (/app/dist/services/elasticsearchService.js:356:30)
+error: Failed to get email stats: connect ECONNREFUSED ::1:9200 {"meta":{"headers":{},"meta":{"aborted":false,"attempts":3,"connection":{"_openRequests":0,"deadCount":0,"headers":{"user-agent":"elasticsearch-js/8.19.1 (linux 6.8.0-1029-aws-x64; Node.js 18.20.8; Transport 8.10.0)","x-elastic-client-meta":"es=8.19.1,js=18.20.8,t=8.10.0,un=18.20.8"},"id":"http://localhost:9200/","maxEventListeners":100,"pool":{"_events":{},"_eventsCount":1},"resurrectTimeout":0,"timeout":30000,"tls":null,"url":"http://localhost:9200/","weight":1000},"context":null,"name":"elasticsearch-js","request":{"id":4,"options":{},"params":{"body":"{\"size\":0,\"aggs\":{\"by_account\":{\"terms\":{\"field\":\"account\"}},\"by_category\":{\"terms\":{\"field\":\"category\"}},\"by_folder\":{\"terms\":{\"field\":\"folder\"}}}}","headers":{"accept":"application/vnd.elasticsearch+json; compatible-with=8","content-length":"148","content-type":"application/vnd.elasticsearch+json; compatible-with=8","user-agent":"elasticsearch-js/8.19.1 (linux 6.8.0-1029-aws-x64; Node.js 18.20.8; Transport 8.10.0)","x-elastic-client-meta":"es=8.19.1,js=18.20.8,t=8.10.0,un=18.20.8"},"method":"POST","path":"/reachinbox_emails/_search","querystring":""}}},"statusCode":0,"warnings":null},"name":"ConnectionError","options":{"redaction":{"additionalKeys":[],"type":"replace"}},"service":"reachinbox-backend","stack":"ConnectionError: connect ECONNREFUSED ::1:9200\n    at SniffingTransport._request (/app/node_modules/@elastic/transport/lib/Transport.js:610:31)\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n    at async /app/node_modules/@elastic/transport/lib/Transport.js:670:32\n    at async SniffingTransport.request (/app/node_modules/@elastic/transport/lib/Transport.js:666:20)\n    at async Client.SearchApi [as search] (/app/node_modules/@elastic/elasticsearch/lib/api/api/search.js:73:12)\n    at async ElasticsearchService.getEmailStats (/app/dist/services/elasticsearchService.js:356:30)","timestamp":"2025-09-08 20:50:55"}
+2025-09-08 20:50:55 [info]: Manual sync requested for account: all, force: false
+info: Manual sync requested for account: all, force: false {"service":"reachinbox-backend","timestamp":"2025-09-08 20:50:55"}
+2025-09-08 20:50:55 [info]: Manual email sync triggered
+info: Manual email sync triggered {"service":"reachinbox-backend","timestamp":"2025-09-08 20:50:55"}
+2025-09-08 20:50:55 [info]: ::1 - - [08/Sep/2025:20:50:55 +0000] "POST /api/emails/sync HTTP/1.1" 200 98 "https://imap-8jyext297-pruthvi-123-progs-projects.vercel.app/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+info: ::1 - - [08/Sep/2025:20:50:55 +0000] "POST /api/emails/sync HTTP/1.1" 200 98 "https://imap-8jyext297-pruthvi-123-progs-projects.vercel.app/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36" {"service":"reachinbox-backend","timestamp":"2025-09-08 20:50:55"}
+2025-09-08 20:50:55 [info]: Force syncing latest emails for account account2 since 2025-09-05
+info: Force syncing latest emails for account account2 since 2025-09-05 {"service":"reachinbox-backend","timestamp":"2025-09-08 20:50:55"}
+2025-09-08 20:50:55 [error]: Error in sync process for account account2: Incorrect number of arguments for search option: SINCE
+Error: Incorrect number of arguments for search option: SINCE
+    at buildSearchQuery (/app/node_modules/imap/lib/Connection.js:1928:19)
+    at Connection._search (/app/node_modules/imap/lib/Connection.js:577:15)
+    at Connection.search (/app/node_modules/imap/lib/Connection.js:566:8)
+    at /app/dist/services/emailSyncService.js:725:30
+    at Connection.<anonymous> (/app/node_modules/imap/lib/Connection.js:432:7)
+    at Connection._resTagged (/app/node_modules/imap/lib/Connection.js:1535:22)
+    at Parser.<anonymous> (/app/node_modules/imap/lib/Connection.js:194:10)
+    at Parser.emit (node:events:517:28)
+    at Parser._resTagged (/app/node_modules/imap/lib/Parser.js:175:10)
+    at Parser._parse (/app/node_modules/imap/lib/Parser.js:139:16)
+error: Error in sync process for account account2: Incorrect number of arguments for search option: SINCE {"service":"reachinbox-backend","stack":"Error: Incorrect number of arguments for search option: SINCE\n    at buildSearchQuery (/app/node_modules/imap/lib/Connection.js:1928:19)\n    at Connection._search (/app/node_modules/imap/lib/Connection.js:577:15)\n    at Connection.search (/app/node_modules/imap/lib/Connection.js:566:8)\n    at /app/dist/services/emailSyncService.js:725:30\n    at Connection.<anonymous> (/app/node_modules/imap/lib/Connection.js:432:7)\n    at Connection._resTagged (/app/node_modules/imap/lib/Connection.js:1535:22)\n    at Parser.<anonymous> (/app/node_modules/imap/lib/Connection.js:194:10)\n    at Parser.emit (node:events:517:28)\n    at Parser._resTagged (/app/node_modules/imap/lib/Parser.js:175:10)\n    at Parser._parse (/app/node_modules/imap/lib/Parser.js:139:16)","timestamp":"2025-09-08 20:50:55"}
+2025-09-08 20:50:56 [info]: Force syncing latest emails for account account1 since 2025-09-05
+info: Force syncing latest emails for account account1 since 2025-09-05 {"service":"reachinbox-backend","timestamp":"2025-09-08 20:50:56"}
+2025-09-08 20:50:56 [error]: Error in sync process for account account1: Incorrect number of arguments for search option: SINCE
+Error: Incorrect number of arguments for search option: SINCE
+    at buildSearchQuery (/app/node_modules/imap/lib/Connection.js:1928:19)
+    at Connection._search (/app/node_modules/imap/lib/Connection.js:577:15)
+    at Connection.search (/app/node_modules/imap/lib/Connection.js:566:8)
+    at /app/dist/services/emailSyncService.js:725:30
+    at Connection.<anonymous> (/app/node_modules/imap/lib/Connection.js:432:7)
+    at Connection._resTagged (/app/node_modules/imap/lib/Connection.js:1535:22)
+    at Parser.<anonymous> (/app/node_modules/imap/lib/Connection.js:194:10)
+    at Parser.emit (node:events:517:28)
+    at Parser._resTagged (/app/node_modules/imap/lib/Parser.js:175:10)
+    at Parser._parse (/app/node_modules/imap/lib/Parser.js:139:16)
+error: Error in sync process for account account1: Incorrect number of arguments for search option: SINCE {"service":"reachinbox-backend","stack":"Error: Incorrect number of arguments for search option: SINCE\n    at buildSearchQuery (/app/node_modules/imap/lib/Connection.js:1928:19)\n    at Connection._search (/app/node_modules/imap/lib/Connection.js:577:15)\n    at Connection.search (/app/node_modules/imap/lib/Connection.js:566:8)\n    at /app/dist/services/emailSyncService.js:725:30\n    at Connection.<anonymous> (/app/node_modules/imap/lib/Connection.js:432:7)\n    at Connection._resTagged (/app/node_modules/imap/lib/Connection.js:1535:22)\n    at Parser.<anonymous> (/app/node_modules/imap/lib/Connection.js:194:10)\n    at Parser.emit (node:events:517:28)\n    at Parser._resTagged (/app/node_modules/imap/lib/Parser.js:175:10)\n    at Parser._parse (/app/node_modules/imap/lib/Parser.js:139:16)","timestamp":"2025-09-08 20:50:56"}
+2025-09-08 20:50:56 [info]: Manual email sync completed
+info: Manual email sync completed {"service":"reachinbox-backend","timestamp":"2025-09-08 20:50:56"}
+2025-09-08 20:50:56 [info]: Background sync completed for account: all
+info: Background sync completed for account: all {"service":"reachinbox-backend","timestamp":"2025-09-08 20:50:56"}
+2025-09-08 20:50:56 [info]: Performing periodic email sync for latest emails
+info: Performing periodic email sync for latest emails {"service":"reachinbox-backend","timestamp":"2025-09-08 20:50:56"}
+2025-09-08 20:50:57 [info]: Syncing recent emails for account account2 using criteria: ["OR",["SINCE","2025-09-07"],["UNSEEN"]]
+info: Syncing recent emails for account account2 using criteria: ["OR",["SINCE","2025-09-07"],["UNSEEN"]] {"service":"reachinbox-backend","timestamp":"2025-09-08 20:50:57"}
+2025-09-08 20:50:57 [error]: Failed to sync recent emails for account account2: Cannot read properties of null (reading 'length')
+TypeError: Cannot read properties of null (reading 'length')
+    at buildSearchQuery (/app/node_modules/imap/lib/Connection.js:1873:16)
+    at Connection._search (/app/node_modules/imap/lib/Connection.js:577:15)
+    at Connection.search (/app/node_modules/imap/lib/Connection.js:566:8)
+    at /app/dist/services/emailSyncService.js:361:30
+    at Connection.<anonymous> (/app/node_modules/imap/lib/Connection.js:432:7)
+    at Connection._resTagged (/app/node_modules/imap/lib/Connection.js:1535:22)
+    at Parser.<anonymous> (/app/node_modules/imap/lib/Connection.js:194:10)
+    at Parser.emit (node:events:517:28)
+    at Parser._resTagged (/app/node_modules/imap/lib/Parser.js:175:10)
+    at Parser._parse (/app/node_modules/imap/lib/Parser.js:139:16)
+error: Failed to sync recent emails for account account2: Cannot read properties of null (reading 'length') {"service":"reachinbox-backend","stack":"TypeError: Cannot read properties of null (reading 'length')\n    at buildSearchQuery (/app/node_modules/imap/lib/Connection.js:1873:16)\n    at Connection._search (/app/node_modules/imap/lib/Connection.js:577:15)\n    at Connection.search (/app/node_modules/imap/lib/Connection.js:566:8)\n    at /app/dist/services/emailSyncService.js:361:30\n    at Connection.<anonymous> (/app/node_modules/imap/lib/Connection.js:432:7)\n    at Connection._resTagged (/app/node_modules/imap/lib/Connection.js:1535:22)\n    at Parser.<anonymous> (/app/node_modules/imap/lib/Connection.js:194:10)\n    at Parser.emit (node:events:517:28)\n    at Parser._resTagged (/app/node_modules/imap/lib/Parser.js:175:10)\n    at Parser._parse (/app/node_modules/imap/lib/Parser.js:139:16)","timestamp":"2025-09-08 20:50:57"}
+2025-09-08 20:50:57 [info]: Syncing recent emails for account account1 using criteria: ["OR",["SINCE","2025-09-07"],["UNSEEN"]]
+info: Syncing recent emails for account account1 using criteria: ["OR",["SINCE","2025-09-07"],["UNSEEN"]] {"service":"reachinbox-backend","timestamp":"2025-09-08 20:50:57"}
+2025-09-08 20:50:57 [error]: Failed to sync recent emails for account account1: Cannot read properties of null (reading 'length')
+TypeError: Cannot read properties of null (reading 'length')
+    at buildSearchQuery (/app/node_modules/imap/lib/Connection.js:1873:16)
+    at Connection._search (/app/node_modules/imap/lib/Connection.js:577:15)
+    at Connection.search (/app/node_modules/imap/lib/Connection.js:566:8)
+    at /app/dist/services/emailSyncService.js:361:30
+    at Connection.<anonymous> (/app/node_modules/imap/lib/Connection.js:432:7)
+    at Connection._resTagged (/app/node_modules/imap/lib/Connection.js:1535:22)
+    at Parser.<anonymous> (/app/node_modules/imap/lib/Connection.js:194:10)
+    at Parser.emit (node:events:517:28)
+    at Parser._resTagged (/app/node_modules/imap/lib/Parser.js:175:10)
+    at Parser._parse (/app/node_modules/imap/lib/Parser.js:139:16)
+error: Failed to sync recent emails for account account1: Cannot read properties of null (reading 'length') {"service":"reachinbox-backend","stack":"TypeError: Cannot read properties of null (reading 'length')\n    at buildSearchQuery (/app/node_modules/imap/lib/Connection.js:1873:16)\n    at Connection._search (/app/node_modules/imap/lib/Connection.js:577:15)\n    at Connection.search (/app/node_modules/imap/lib/Connection.js:566:8)\n    at /app/dist/services/emailSyncService.js:361:30\n    at Connection.<anonymous> (/app/node_modules/imap/lib/Connection.js:432:7)\n    at Connection._resTagged (/app/node_modules/imap/lib/Connection.js:1535:22)\n    at Parser.<anonymous> (/app/node_modules/imap/lib/Connection.js:194:10)\n    at Parser.emit (node:events:517:28)\n    at Parser._resTagged (/app/node_modules/imap/lib/Parser.js:175:10)\n    at Parser._parse (/app/node_modules/imap/lib/Parser.js:139:16)","timestamp":"2025-09-08 20:50:57"}
+2025-09-08 20:50:58 [warn]: Elasticsearch is not available, returning empty search results
+warn: Elasticsearch is not available, returning empty search results {"service":"reachinbox-backend","timestamp":"2025-09-08 20:50:58"}
+2025-09-08 20:50:58 [info]: ::1 - - [08/Sep/2025:20:50:58 +0000] "GET /api/emails?limit=10&sort=date&order=desc HTTP/1.1" 304 - "https://imap-8jyext297-pruthvi-123-progs-projects.vercel.app/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+info: ::1 - - [08/Sep/2025:20:50:58 +0000] "GET /api/emails?limit=10&sort=date&order=desc HTTP/1.1" 304 - "https://imap-8jyext297-pruthvi-123-progs-projects.vercel.app/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36" {"service":"reachinbox-backend","timestamp":"2025-09-08 20:50:58"}
+2025-09-08 20:50:58 [info]: ::1 - - [08/Sep/2025:20:50:58 +0000] "GET /api/emails/sync/status HTTP/1.1" 304 - "https://imap-8jyext297-pruthvi-123-progs-projects.vercel.app/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+info: ::1 - - [08/Sep/2025:20:50:58 +0000] "GET /api/emails/sync/status HTTP/1.1" 304 - "https://imap-8jyext297-pruthvi-123-progs-projects.vercel.app/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36" {"service":"reachinbox-backend","timestamp":"2025-09-08 20:50:58"}
+2025-09-08 20:51:00 [warn]: Elasticsearch is not available, returning empty search results
+warn: Elasticsearch is not available, returning empty search results {"service":"reachinbox-backend","timestamp":"2025-09-08 20:51:00"}
+2025-09-08 20:51:00 [info]: ::1 - - [08/Sep/2025:20:51:00 +0000] "GET /api/emails?limit=100&sort=date&order=desc HTTP/1.1" 304 - "https://imap-8jyext297-pruthvi-123-progs-projects.vercel.app/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+info: ::1 - - [08/Sep/2025:20:51:00 +0000] "GET /api/emails?limit=100&sort=date&order=desc HTTP/1.1" 304 - "https://imap-8jyext297-pruthvi-123-progs-projects.vercel.app/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36" {"service":"reachinbox-backend","timestamp":"2025-09-08 20:51:00"}
+2025-09-08 20:51:01 [warn]: Using mock data for email stats:
+warn: Using mock data for email stats: {"service":"reachinbox-backend","timestamp":"2025-09-08 20:51:01"}
+2025-09-08 20:51:01 [info]: ::1 - - [08/Sep/2025:20:51:01 +0000] "GET /api/emails/stats/overview HTTP/1.1" 200 684 "https://imap-8jyext297-pruthvi-123-progs-projects.vercel.app/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+info: ::1 - - [08/Sep/2025:20:51:01 +0000] "GET /api/emails/stats/overview HTTP/1.1" 200 684 "https://imap-8jyext297-pruthvi-123-progs-projects.vercel.app/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36" {"service":"reachinbox-backend","timestamp":"2025-09-08 20:51:01"}
+2025-09-08 20:51:02 [info]: ::1 - - [08/Sep/2025:20:51:02 +0000] "GET /api/emails/sync/status HTTP/1.1" 304 - "https://imap-8jyext297-pruthvi-123-progs-projects.vercel.app/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+info: ::1 - - [08/Sep/2025:20:51:02 +0000] "GET /api/emails/sync/status HTTP/1.1" 304 - "https://imap-8jyext297-pruthvi-123-progs-projects.vercel.app/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36" {"service":"reachinbox-backend","timestamp":"2025-09-08 20:51:02"}
+2025-09-08 20:51:03 [warn]: Health check: Elasticsearch connection failed: Elasticsearch ping timed out after 1 second
+warn: Health check: Elasticsearch connection failed: Elasticsearch ping timed out after 1 second {"service":"reachinbox-backend","timestamp":"2025-09-08 20:51:03"}
+2025-09-08 20:51:03 [error]: Slack connection test failed: An API error occurred: invalid_auth
+Error: An API error occurred: invalid_auth
+    at platformErrorFromResult (/app/node_modules/@slack/web-api/dist/errors.js:62:33)
+    at WebClient.apiCall (/app/node_modules/@slack/web-api/dist/WebClient.js:181:56)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async SlackService.testConnection (/app/dist/services/slackService.js:90:28)
+    at async /app/dist/routes/healthRoutes.js:107:38
+error: Slack connection test failed: An API error occurred: invalid_auth {"code":"slack_webapi_platform_error","data":{"error":"invalid_auth","ok":false,"response_metadata":{}},"service":"reachinbox-backend","stack":"Error: An API error occurred: invalid_auth\n    at platformErrorFromResult (/app/node_modules/@slack/web-api/dist/errors.js:62:33)\n    at WebClient.apiCall (/app/node_modules/@slack/web-api/dist/WebClient.js:181:56)\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n    at async SlackService.testConnection (/app/dist/services/slackService.js:90:28)\n    at async /app/dist/routes/healthRoutes.js:107:38","timestamp":"2025-09-08 20:51:03"}
+2025-09-08 20:51:03 [info]: ::1 - - [08/Sep/2025:20:51:03 +0000] "GET /api/health/detailed HTTP/1.1" 200 789 "https://imap-8jyext297-pruthvi-123-progs-projects.vercel.app/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+info: ::1 - - [08/Sep/2025:20:51:03 +0000] "GET /api/health/detailed HTTP/1.1" 200 789 "https://imap-8jyext297-pruthvi-123-progs-projects.vercel.app/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36" {"service":"reachinbox-backend","timestamp":"2025-09-08 20:51:03"}
+2025-09-08 20:51:03 [warn]: Elasticsearch is not available, returning empty search results
+warn: Elasticsearch is not available, returning empty search results {"service":"reachinbox-backend","timestamp":"2025-09-08 20:51:03"}
+2025-09-08 20:51:03 [info]: ::1 - - [08/Sep/2025:20:51:03 +0000] "GET /api/emails?limit=100&sort=date&order=desc&dateFrom=2025-08-09T20:51:02.742Z HTTP/1.1" 200 226 "https://imap-8jyext297-pruthvi-123-progs-projects.vercel.app/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+info: ::1 - - [08/Sep/2025:20:51:03 +0000] "GET /api/emails?limit=100&sort=date&order=desc&dateFrom=2025-08-09T20:51:02.742Z HTTP/1.1" 200 226 "https://imap-8jyext297-pruthvi-123-progs-projects.vercel.app/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36" {"service":"reachinbox-backend","timestamp":"2025-09-08 20:51:03"}

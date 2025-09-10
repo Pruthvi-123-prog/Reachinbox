@@ -1,0 +1,140 @@
+import React from 'react';
+import { Button as MuiButton, ButtonProps as MuiButtonProps, styled, CircularProgress } from '@mui/material';
+
+// Define valid color options that exist in MUI palette
+type ButtonColor = 'primary' | 'secondary' | 'success' | 'error' | 'warning' | 'info';
+
+interface ButtonProps extends Omit<MuiButtonProps, 'color'> {
+  gradient?: boolean;
+  glassMorphic?: boolean;
+  loading?: boolean;
+  glow?: boolean;
+  color?: ButtonColor;
+}
+
+// Styled button with glassmorphic and gradient options
+const StyledButton = styled(MuiButton, {
+  shouldForwardProp: (prop) => 
+    !['gradient', 'glassMorphic', 'glow', 'loading'].includes(prop as string),
+})<ButtonProps>(({ theme, gradient, glassMorphic, glow, variant, color = 'primary' }) => {
+  // Safe way to access palette colors with type checking
+  const getColorValue = (colorName: ButtonColor, variant: string) => {
+    const palette = theme.palette as Record<ButtonColor, { main: string, light: string, dark: string, contrastText: string }>;
+    return palette[colorName]?.[variant] || palette.primary[variant];
+  };
+  
+  return {
+    borderRadius: '8px',
+    padding: '10px 24px',
+    fontWeight: 500,
+    textTransform: 'none',
+    transition: 'all 0.3s ease',
+    position: 'relative',
+    overflow: 'hidden',
+    letterSpacing: '0.2px',
+    boxShadow: glow 
+      ? `0 0 15px 2px ${getColorValue(color as ButtonColor, 'main')}40` 
+      : 'none',
+
+    '&:hover': {
+      transform: 'translateY(-2px)',
+      boxShadow: glow 
+        ? `0 0 20px 5px ${getColorValue(color as ButtonColor, 'main')}60` 
+        : glassMorphic 
+          ? '0 8px 16px rgba(0, 0, 0, 0.15)' 
+          : '',
+    },
+    
+    ...(variant === 'contained' && {
+      background: gradient 
+        ? 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)' 
+        : getColorValue(color as ButtonColor, 'main'),
+      color: getColorValue(color as ButtonColor, 'contrastText'),
+      '&:hover': {
+        background: gradient 
+          ? 'linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)' 
+          : getColorValue(color as ButtonColor, 'dark'),
+        transform: 'translateY(-2px)',
+      },
+    }),
+
+    ...(variant === 'outlined' && {
+      borderColor: glassMorphic 
+        ? 'rgba(255, 255, 255, 0.2)' 
+        : getColorValue(color as ButtonColor, 'main'),
+      background: glassMorphic 
+        ? 'linear-gradient(135deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.06) 100%)' 
+        : 'transparent',
+      backdropFilter: glassMorphic ? 'blur(12px)' : 'none',
+      color: glassMorphic 
+        ? 'rgba(255, 255, 255, 0.9)' 
+        : getColorValue(color as ButtonColor, 'main'),
+      '&:hover': {
+        borderColor: glassMorphic 
+          ? 'rgba(255, 255, 255, 0.3)' 
+          : getColorValue(color as ButtonColor, 'dark'),
+        background: glassMorphic 
+          ? 'linear-gradient(135deg, rgba(255, 255, 255, 0.18) 0%, rgba(255, 255, 255, 0.09) 100%)' 
+          : 'rgba(255, 255, 255, 0.05)',
+      },
+    }),
+
+    ...(variant === 'text' && {
+      color: getColorValue(color as ButtonColor, 'main'),
+      '&:hover': {
+        backgroundColor: `${getColorValue(color as ButtonColor, 'main')}15`,
+      },
+    }),
+    
+    '&.Mui-disabled': {
+      backgroundColor: variant === 'contained' 
+        ? 'rgba(255, 255, 255, 0.12)'
+        : 'transparent',
+      color: 'rgba(255, 255, 255, 0.3)',
+      borderColor: variant === 'outlined' 
+        ? 'rgba(255, 255, 255, 0.15)' 
+        : 'transparent',
+    },
+  }
+});
+
+// Button component with loading state
+export const Button: React.FC<ButtonProps> = ({
+  children,
+  gradient = false,
+  glassMorphic = false,
+  glow = false,
+  loading = false,
+  disabled = false,
+  startIcon,
+  ...props
+}) => {
+  return (
+    <StyledButton
+      gradient={gradient}
+      glassMorphic={glassMorphic}
+      glow={glow}
+      disabled={disabled || loading}
+      startIcon={loading ? undefined : startIcon}
+      {...props}
+    >
+      {loading ? (
+        <>
+          <CircularProgress
+            size={20}
+            color="inherit"
+            sx={{ 
+              marginRight: '10px',
+              color: 'inherit',
+            }}
+          />
+          {children}
+        </>
+      ) : (
+        children
+      )}
+    </StyledButton>
+  );
+};
+
+export default Button;

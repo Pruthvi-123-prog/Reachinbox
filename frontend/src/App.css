@@ -1,0 +1,365 @@
+/* IMAP Email App - Diganthadeepa-inspired Theme */
+@import url('https://api.fontshare.com/v2/css?f[]=neue-montreal@400,500,700&display=swap');
+
+/* Import design system */
+@import './styles/animations.css';
+
+:root {
+  /* Color Palette */
+  --color-background: #030303;
+  --color-surface: #0a0a0a;
+  --color-surface-raised: #111111;
+  --color-text-primary: #e6e6e6;
+  --color-text-secondary: #b3b3b3;
+  --color-border: rgba(255, 255, 255, 0.08);
+  
+  /* Accent Colors */
+  --color-primary: #0d4d6e;
+  --color-primary-light: #3b7d9c;
+  --color-primary-dark: #0a3246;
+  --color-secondary: #9fb3c8;
+  --color-secondary-light: #cfd8e3;
+  
+  /* Design System */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-xxl: 24px;
+  --radius-round: 9999px;
+  
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.15);
+  --shadow-md: 0 4px 20px rgba(0, 0, 0, 0.15);
+  --shadow-lg: 0 8px 30px rgba(0, 0, 0, 0.15);
+  --shadow-xl: 0 12px 40px rgba(0, 0, 0, 0.2);
+  
+  --transition-base: all 0.3s ease;
+  --transition-fast: all 0.15s ease;
+  --transition-slow: all 0.5s ease;
+  
+  --glass-bg: rgba(17, 17, 17, 0.7);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-blur: blur(10px);
+  
+  /* Status Colors */
+  --color-success: #0ea5e9;
+  --color-warning: #f59e0b;
+  --color-error: #ef4444;
+  --color-info: #3b82f6;
+  
+  /* Category Colors */
+  --color-interested: #0ea5e9;
+  --color-meeting: #3b7d9c;
+  --color-not-interested: #ef4444;
+  --color-spam: #9ca3af;
+  --color-out-of-office: #f59e0b;
+  --color-business: #0d4d6e;
+  --color-personal: #8b5cf6;
+  --color-support: #10b981;
+  --color-promotional: #6366f1;
+  --color-newsletter: #94a3b8;
+}
+
+/* Global Styles */
+body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--color-background);
+  background-image: radial-gradient(circle at 50% 50%, #0a0a0a 0%, #030303 100%);
+  background-attachment: fixed;
+  color: var(--color-text-primary);
+  font-family: 'Neue Montreal', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Background Elements */
+.bg-gradient {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  background: radial-gradient(circle at 50% 50%, #0a0a0a 0%, #030303 100%);
+  opacity: 0.8;
+}
+
+.particles-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+/* Typography */
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Neue Montreal', sans-serif;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+/* MUI Component Overrides */
+.MuiPaper-root {
+  background-image: none !important;
+  background-color: var(--glass-bg) !important;
+  backdrop-filter: var(--glass-blur) !important;
+  -webkit-backdrop-filter: var(--glass-blur) !important;
+  box-shadow: var(--shadow-md) !important;
+  border: 1px solid var(--glass-border) !important;
+  transition: var(--transition-base) !important;
+  border-radius: var(--radius-lg) !important;
+}
+
+.MuiButton-root {
+  text-transform: none !important;
+  font-weight: 500 !important;
+  transition: var(--transition-base) !important;
+  border-radius: var(--radius-round) !important;
+  box-shadow: none !important;
+  letter-spacing: 0.5px !important;
+}
+
+.MuiButton-containedPrimary {
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-light) 100%) !important;
+}
+
+.MuiButton-containedPrimary:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 8px 20px rgba(13, 77, 110, 0.3) !important;
+}
+
+/* Custom Components */
+.gradient-text {
+  background: linear-gradient(135deg, #FFFFFF 0%, #b3b3b3 50%, var(--color-primary) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  display: inline-block;
+}
+
+.gradient-text-silver {
+  background: linear-gradient(135deg, #FFFFFF 0%, #b3b3b3 80%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  display: inline-block;
+}
+
+.glass-card {
+  background: var(--glass-bg) !important;
+  backdrop-filter: var(--glass-blur) !important;
+  -webkit-backdrop-filter: var(--glass-blur) !important;
+  border: 1px solid var(--glass-border) !important;
+  transition: var(--transition-base) !important;
+  border-radius: var(--radius-lg) !important;
+  box-shadow: var(--shadow-md) !important;
+}
+
+.glass-card:hover {
+  border-color: rgba(255, 255, 255, 0.12) !important;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.25) !important;
+}
+
+.glass-button {
+  position: relative;
+  overflow: hidden;
+  padding: 0.75rem 1.5rem;
+  font-weight: 500;
+  color: white;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+  border-radius: 9999px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transition: all 0.3s ease;
+}
+
+.animated-border::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: linear-gradient(135deg, #0077ff, #7928ca);
+  border-radius: 14px;
+  z-index: -1;
+  animation: border-animation 4s ease-in-out infinite;
+}
+
+@keyframes border-animation {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* Layout Components */
+.page-container {
+  position: relative;
+  padding-top: 16px;
+  padding-bottom: 24px;
+  z-index: 1;
+}
+
+.page-header {
+  margin-bottom: 24px;
+}
+
+.page-title {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+  position: relative;
+}
+
+.page-description {
+  color: var(--mui-text-secondary);
+  font-size: 1rem;
+  max-width: 600px;
+}
+
+/* Background Effects */
+.bg-gradient {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.bg-gradient::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    radial-gradient(circle at 10% 10%, rgba(13, 77, 110, 0.15), transparent 30%),
+    radial-gradient(circle at 90% 20%, rgba(204, 102, 0, 0.15), transparent 30%),
+    radial-gradient(circle at 50% 80%, rgba(13, 77, 110, 0.1), transparent 50%);
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* Enhanced UI Components */
+
+/* Cards with hover effects */
+.interactive-card {
+  transition: var(--transition-base);
+  cursor: pointer;
+}
+
+.interactive-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-xl) !important;
+}
+
+/* Dashboard stat cards */
+.stat-card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: var(--space-lg);
+  border-radius: var(--radius-lg);
+  background-color: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--glass-border);
+  transition: var(--transition-base);
+}
+
+.stat-card:hover {
+  border-color: rgba(255, 255, 255, 0.12);
+  box-shadow: var(--shadow-xl);
+}
+
+.stat-card__title {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  margin-bottom: var(--space-xs);
+}
+
+.stat-card__value {
+  font-size: 1.75rem;
+  font-weight: 600;
+  margin-bottom: var(--space-xs);
+}
+
+.stat-card__comparison {
+  font-size: 0.8125rem;
+  display: flex;
+  align-items: center;
+  margin-top: auto;
+}
+
+/* Email list item styling */
+.email-list-item {
+  transition: var(--transition-base);
+  border-radius: var(--radius-md) !important;
+  margin-bottom: var(--space-xs);
+}
+
+.email-list-item:hover {
+  background-color: rgba(255, 255, 255, 0.03) !important;
+}
+
+.email-list-item__unread {
+  border-left: 3px solid var(--color-primary) !important;
+}
+
+/* Badge styling */
+.category-badge {
+  border-radius: 12px !important;
+  padding: 4px 10px !important;
+  font-size: 0.75rem !important;
+  font-weight: 500 !important;
+  height: 24px !important;
+}
+
+/* Search input styling */
+.search-input {
+  background-color: var(--glass-bg) !important;
+  border-radius: var(--radius-md) !important;
+  backdrop-filter: blur(var(--glass-blur)) !important;
+  border: 1px solid var(--glass-border) !important;
+  transition: var(--transition-base) !important;
+}
+
+.search-input:hover {
+  border-color: rgba(255, 255, 255, 0.12) !important;
+}
+
+.search-input:focus-within {
+  border-color: var(--color-primary) !important;
+  box-shadow: 0 0 0 2px rgba(0, 119, 255, 0.2) !important;
+}

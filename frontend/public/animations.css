@@ -1,0 +1,122 @@
+/* ReachInbox Animation System */
+
+/* Element entry animations */
+.fadeIn {
+  animation: fadeIn 0.5s var(--ease-smooth) forwards;
+}
+
+.slideUp {
+  animation: slideUp 0.5s var(--ease-smooth) forwards;
+}
+
+.slideInLeft {
+  animation: slideInLeft 0.5s var(--ease-smooth) forwards;
+}
+
+/* Animation Delays */
+.delay-100 { animation-delay: 100ms; }
+.delay-200 { animation-delay: 200ms; }
+.delay-300 { animation-delay: 300ms; }
+.delay-400 { animation-delay: 400ms; }
+.delay-500 { animation-delay: 500ms; }
+
+/* Dashboard Specific Animations */
+.dashboard-container {
+  opacity: 0;
+  animation: fadeIn 0.5s var(--ease-smooth) forwards;
+}
+
+.dashboard-header {
+  animation: slideInLeft 0.6s var(--ease-smooth) forwards;
+}
+
+.metrics-container > div:nth-child(1) {
+  opacity: 0;
+  animation: slideUp 0.5s var(--ease-smooth) 0.1s forwards;
+}
+
+.metrics-container > div:nth-child(2) {
+  opacity: 0;
+  animation: slideUp 0.5s var(--ease-smooth) 0.2s forwards;
+}
+
+.metrics-container > div:nth-child(3) {
+  opacity: 0;
+  animation: slideUp 0.5s var(--ease-smooth) 0.3s forwards;
+}
+
+/* Email List Animations */
+.email-list-container {
+  opacity: 0;
+  animation: fadeIn 0.5s var(--ease-smooth) forwards;
+}
+
+.email-list .email-item {
+  opacity: 0;
+  transform: translateY(10px);
+  animation: slideUp 0.4s var(--ease-smooth) forwards;
+}
+
+.email-list .email-item:nth-child(1) { animation-delay: 0.05s; }
+.email-list .email-item:nth-child(3) { animation-delay: 0.1s; }
+.email-list .email-item:nth-child(5) { animation-delay: 0.15s; }
+.email-list .email-item:nth-child(7) { animation-delay: 0.2s; }
+.email-list .email-item:nth-child(9) { animation-delay: 0.25s; }
+.email-list .email-item:nth-child(11) { animation-delay: 0.3s; }
+
+/* Loading States */
+.loading-container {
+  animation: fadeIn 0.5s var(--ease-smooth) forwards;
+}
+
+.loading-container .MuiCircularProgress-root {
+  animation: glowPulse 2s infinite;
+}
+
+/* Background Effects */
+.bg-gradient {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: 
+    radial-gradient(circle at 10% 10%, rgba(0, 119, 255, 0.03), transparent 30%),
+    radial-gradient(circle at 90% 20%, rgba(121, 40, 202, 0.03), transparent 40%),
+    radial-gradient(circle at 50% 50%, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.3) 100%);
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* Hover Effect Animations */
+.card-hover-effect {
+  transition: transform var(--transition-medium) var(--ease-smooth),
+              box-shadow var(--transition-medium) var(--ease-smooth);
+}
+
+.card-hover-effect:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+}
+
+/* Button Animation */
+.animated-button {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s var(--ease-smooth);
+}
+
+.animated-button::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: all 0.5s var(--ease-smooth);
+}
+
+.animated-button:hover::after {
+  left: 100%;
+}

@@ -1,0 +1,46 @@
+services:
+  - type: web
+    name: reachinbox-backend
+    env: docker
+    region: oregon
+    dockerfilePath: Dockerfile
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3000
+      - key: FRONTEND_URL
+        value: https://imap-fawn.vercel.app
+      - key: GROQ_API_KEY
+        sync: false
+      - key: ELASTICSEARCH_HOST
+        value: https://elasticsearch-service.onrender.com
+      - key: ELASTICSEARCH_INDEX_PREFIX
+        value: reachinbox
+      - key: DEEPSEEK_API_KEY
+        sync: false
+      - key: DEEPSEEK_MODEL
+        value: deepseek-chat
+      - key: DEEPSEEK_API_BASE_URL
+        value: https://api.deepseek.com
+      - key: IMAP1_HOST
+        value: imap.gmail.com
+      - key: IMAP1_PORT
+        value: 993
+      - key: IMAP1_USER
+        sync: false
+      - key: IMAP1_PASSWORD
+        sync: false
+      - key: IMAP1_TLS
+        value: "true"
+      - key: IMAP2_HOST
+        value: imap.gmail.com
+      - key: IMAP2_PORT
+        value: 993
+      - key: IMAP2_USER
+        sync: false
+      - key: IMAP2_PASSWORD
+        sync: false
+      - key: IMAP2_TLS
+        value: "true"
