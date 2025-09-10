@@ -38,8 +38,8 @@ router.post('/', asyncHandler(async (req: Request, res: Response) => {
     if (filters.isStarred !== undefined) searchQuery.isStarred = Boolean(filters.isStarred);
     if (filters.hasAttachments !== undefined) searchQuery.hasAttachments = Boolean(filters.hasAttachments);
 
-    const { elasticsearchService } = require('../index');
-    const result = await elasticsearchService.searchEmails(searchQuery);
+    const { imapEmailService } = require('../index');
+    const result = await imapEmailService.searchEmails(searchQuery);
 
     res.status(200).json({
       success: true,
@@ -92,8 +92,8 @@ router.get('/quick', asyncHandler(async (req: Request, res: Response) => {
       searchQuery.category = category as EmailCategory;
     }
 
-    const { elasticsearchService } = require('../index');
-    const result = await elasticsearchService.searchEmails(searchQuery);
+    const { imapEmailService } = require('../index');
+    const result = await imapEmailService.searchEmails(searchQuery);
 
     // Return simplified response for quick search
     const quickResults = result.emails.map(email => ({
@@ -137,7 +137,7 @@ router.get('/suggestions', asyncHandler(async (req: Request, res: Response) => {
   }
 
   try {
-    const { elasticsearchService } = require('../index');
+    const { imapEmailService } = require('../index');
     
     const suggestions: any = {
       senders: [],
@@ -149,7 +149,7 @@ router.get('/suggestions', asyncHandler(async (req: Request, res: Response) => {
     // Get suggestions based on type
     if (type === 'all' || type === 'senders') {
       // Search for sender suggestions
-      const senderResults = await elasticsearchService.searchEmails({
+      const senderResults = await imapEmailService.searchEmails({
         q: `sender.address:*${q}* OR sender.name:*${q}*`,
         limit: 5
       });
@@ -164,7 +164,7 @@ router.get('/suggestions', asyncHandler(async (req: Request, res: Response) => {
 
     if (type === 'all' || type === 'subjects') {
       // Search for subject suggestions
-      const subjectResults = await elasticsearchService.searchEmails({
+      const subjectResults = await imapEmailService.searchEmails({
         q: `subject:*${q}*`,
         limit: 5
       });
@@ -176,7 +176,7 @@ router.get('/suggestions', asyncHandler(async (req: Request, res: Response) => {
 
     if (type === 'all' || type === 'accounts') {
       // Get account suggestions
-      const accountResults = await elasticsearchService.searchEmails({
+      const accountResults = await imapEmailService.searchEmails({
         q: `account:*${q}*`,
         limit: 5
       });
@@ -188,7 +188,7 @@ router.get('/suggestions', asyncHandler(async (req: Request, res: Response) => {
 
     if (type === 'all' || type === 'folders') {
       // Get folder suggestions
-      const folderResults = await elasticsearchService.searchEmails({
+      const folderResults = await imapEmailService.searchEmails({
         q: `folder:*${q}*`,
         limit: 5
       });
@@ -247,8 +247,8 @@ router.get('/by-category', asyncHandler(async (req: Request, res: Response) => {
     if (dateFrom) searchQuery.dateFrom = new Date(dateFrom as string);
     if (dateTo) searchQuery.dateTo = new Date(dateTo as string);
 
-    const { elasticsearchService } = require('../index');
-    const result = await elasticsearchService.searchEmails(searchQuery);
+    const { imapEmailService } = require('../index');
+    const result = await imapEmailService.searchEmails(searchQuery);
 
     res.status(200).json({
       success: true,
@@ -273,10 +273,10 @@ router.get('/:emailId/similar', asyncHandler(async (req: Request, res: Response)
   const { limit = '5' } = req.query;
 
   try {
-    const { elasticsearchService } = require('../index');
+    const { imapEmailService } = require('../index');
     
     // Get the original email
-    const originalEmail = await elasticsearchService.getEmailById(emailId);
+    const originalEmail = await imapEmailService.getEmailById(emailId);
     if (!originalEmail) {
       return res.status(404).json({
         success: false,
@@ -298,7 +298,7 @@ router.get('/:emailId/similar', asyncHandler(async (req: Request, res: Response)
       sortOrder: 'desc'
     };
 
-    const result = await elasticsearchService.searchEmails(searchQuery);
+    const result = await imapEmailService.searchEmails(searchQuery);
     
     // Filter out the original email
     const similarEmails = result.emails.filter(email => email.id !== emailId);
@@ -335,7 +335,7 @@ router.get('/analytics/trends', asyncHandler(async (req: Request, res: Response)
   } = req.query;
 
   try {
-    const { elasticsearchService } = require('../index');
+    const { imapEmailService } = require('../index');
     
     // Calculate date range based on period
     const now = new Date();
@@ -367,8 +367,8 @@ router.get('/analytics/trends', asyncHandler(async (req: Request, res: Response)
     }
 
     // Get basic stats
-    const result = await elasticsearchService.searchEmails(searchQuery);
-    const stats = await elasticsearchService.getEmailStats();
+    const result = await imapEmailService.searchEmails(searchQuery);
+    const stats = await imapEmailService.getEmailStats();
 
     res.status(200).json({
       success: true,

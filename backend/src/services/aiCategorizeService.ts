@@ -19,7 +19,7 @@ export class AICategorizeService {
         this.isGroq = true;
         this.isDeepSeek = false;
         
-        // Test Groq connection
+        // Test Groq connection asynchronously without blocking initialization
         groqService.testGroqConnection().then(result => {
           if (result.valid) {
             logger.info('Groq API connection successful, using Groq for email categorization');
@@ -27,20 +27,27 @@ export class AICategorizeService {
           } else {
             logger.warn('Groq API connection failed, falling back to DeepSeek or rule-based categorization');
             this.isGroq = false;
-            // Continue with DeepSeek initialization below
+            this.initializeDeepSeek();
           }
         }).catch(error => {
           logger.error('Error testing Groq API connection:', error);
           this.isGroq = false;
-          // Continue with DeepSeek initialization below
+          this.initializeDeepSeek();
         });
         
-        // If Groq is available, we'll return early and skip DeepSeek initialization
-        if (this.isGroq && this.isEnabled) {
-          return;
-        }
+        // Don't return early - let the async test complete
+      } else {
+        // No Groq available, try DeepSeek
+        this.initializeDeepSeek();
       }
-      
+    } catch (error) {
+      logger.error('Failed to initialize AI categorization service:', error);
+      this.isEnabled = false;
+    }
+  }
+
+  private initializeDeepSeek(): void {
+    try {
       // Fall back to DeepSeek if Groq is not available or failed
       let apiKey = process.env.DEEPSEEK_API_KEY;
       const baseUrl = process.env.DEEPSEEK_API_BASE_URL || 'https://api.deepseek.com';
@@ -71,7 +78,7 @@ export class AICategorizeService {
         this.model = process.env.DEEPSEEK_MODEL || 'deepseek-chat';
         this.isEnabled = true;
         
-        // Test the API key with a simple request
+        // Test the API key with a simple request asynchronously
         this.testApiKey().then(isValid => {
           if (!isValid) {
             if (this.isInsufficientBalance) {
@@ -93,7 +100,7 @@ export class AICategorizeService {
         this.isEnabled = false;
       }
     } catch (error) {
-      logger.error('Failed to initialize AI categorization service:', error);
+      logger.error('Failed to initialize DeepSeek service:', error);
       this.isEnabled = false;
     }
   }
@@ -855,5 +862,14 @@ ${context.length > 0 ? `\nAdditional Context:\n${context.join('\n')}` : ''}
 ${productInfo ? `\nProduct/Service Information:\n${productInfo}` : ''}
 
 Please generate an appropriate reply that addresses the sender's message and maintains professional tone.`;
+  }
+
+  getStatus(): { enabled: boolean; provider: string; model?: string; fallbackAvailable: boolean } {
+    return {
+      enabled: this.isEnabled,
+      provider: this.isGroq ? 'groq' : (this.isDeepSeek ? 'deepseek' : 'rule-based'),
+      model: this.isEnabled ? this.model : undefined,
+      fallbackAvailable: true // Rule-based categorization is always available
+    };
   }
 }

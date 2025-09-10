@@ -66,8 +66,8 @@ router.get('/', emailCors, asyncHandler(async (req: Request, res: Response) => {
   if (hasAttachments !== undefined) searchQuery.hasAttachments = hasAttachments === 'true';
 
   try {
-    const { elasticsearchService } = require('../index');
-    const result = await elasticsearchService.searchEmails(searchQuery);
+    const { imapEmailService } = require('../index');
+    const result = await imapEmailService.searchEmails(searchQuery);
 
     res.status(200).json({
       success: true,
@@ -90,8 +90,8 @@ router.get('/:id', asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
 
   try {
-    const { elasticsearchService } = require('../index');
-    const email = await elasticsearchService.getEmailById(id);
+    const { imapEmailService } = require('../index');
+    const email = await imapEmailService.getEmailById(id);
 
     if (!email) {
       return res.status(404).json({
@@ -137,10 +137,10 @@ router.patch('/:id', asyncHandler(async (req: Request, res: Response) => {
   }
 
   try {
-    const { elasticsearchService } = require('../index');
+    const { imapEmailService } = require('../index');
     
     // Check if email exists
-    const existingEmail = await elasticsearchService.getEmailById(id);
+    const existingEmail = await imapEmailService.getEmailById(id);
     if (!existingEmail) {
       return res.status(404).json({
         success: false,
@@ -150,10 +150,10 @@ router.patch('/:id', asyncHandler(async (req: Request, res: Response) => {
     }
 
     // Update email
-    await elasticsearchService.updateEmail(id, updates);
+    await imapEmailService.updateEmail(id, updates);
 
     // Get updated email
-    const updatedEmail = await elasticsearchService.getEmailById(id);
+    const updatedEmail = await imapEmailService.getEmailById(id);
 
     res.status(200).json({
       success: true,
@@ -174,23 +174,23 @@ router.patch('/:id', asyncHandler(async (req: Request, res: Response) => {
 // Get email statistics
 router.get('/stats/overview', asyncHandler(async (req: Request, res: Response) => {
   try {
-    const { elasticsearchService } = require('../index');
+    const { imapEmailService } = require('../index');
     
-    // Check if Elasticsearch is available before attempting to get stats
+    // Check if IMAP service is available before attempting to get stats
     let stats;
     let usingMockData = false;
     
     try {
       // Try to get stats with a timeout
-      const statsPromise = elasticsearchService.getEmailStats();
+      const statsPromise = imapEmailService.getEmailStats();
       const timeoutPromise = new Promise((_, reject) => {
-        setTimeout(() => reject(new Error('Elasticsearch timeout')), 3000);
+        setTimeout(() => reject(new Error('IMAP service timeout')), 3000);
       });
       
       stats = await Promise.race([statsPromise, timeoutPromise]);
-    } catch (esError: any) {
-      // Elasticsearch is unavailable, use mock data
-      logger.warn('Using mock data for email stats:', esError.message);
+    } catch (imapError: any) {
+      // IMAP service is unavailable, use mock data
+      logger.warn('Using mock data for email stats:', imapError.message);
       
       usingMockData = true;
       stats = {

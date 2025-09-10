@@ -7,7 +7,7 @@ import rateLimit from 'express-rate-limit';
 import dotenv from 'dotenv';
 import { logger } from './utils/logger';
 import { errorHandler } from './utils/errorHandler';
-import { ElasticsearchService } from './services/elasticsearchService';
+import { ImapEmailService } from './services/imapEmailService';
 import { EmailSyncService } from './services/emailSyncService';
 import { SlackService } from './services/slackService';
 import { WebhookService } from './services/webhookService';
@@ -100,7 +100,7 @@ app.use('/api/analytics', analyticsRoutes);
 app.use(errorHandler);
 
 // Global services
-let elasticsearchService: ElasticsearchService;
+let imapEmailService: ImapEmailService;
 let emailSyncService: EmailSyncService;
 let slackService: SlackService;
 let webhookService: WebhookService;
@@ -113,9 +113,9 @@ async function initializeServices() {
   try {
     logger.info('Initializing services...');
     
-    // Initialize Elasticsearch
-    elasticsearchService = new ElasticsearchService();
-    const elasticsearchAvailable = await elasticsearchService.initialize();
+    // Initialize IMAP Email Service
+    imapEmailService = new ImapEmailService();
+    const imapServiceAvailable = await imapEmailService.initialize();
     
     // Initialize AI categorization service
     aiCategorizeService = new AICategorizeService();
@@ -126,18 +126,17 @@ async function initializeServices() {
     // Initialize Webhook service
     webhookService = new WebhookService();
     
-    // Always initialize the Email sync service, even if Elasticsearch is not available
-    // This allows the service to run in a degraded mode without Elasticsearch
+    // Initialize the Email sync service with IMAP service
     emailSyncService = new EmailSyncService(
-      elasticsearchService,
+      imapEmailService,
       aiCategorizeService,
       slackService,
       webhookService
     );
     
     // Set a flag to indicate if we're running in fallback mode
-    if (!elasticsearchAvailable) {
-      logger.warn('Initializing Email sync service in fallback mode due to Elasticsearch unavailability');
+    if (!imapServiceAvailable) {
+      logger.warn('Initializing Email sync service in fallback mode due to IMAP service unavailability');
       // We still initialize the service but some features will be limited
     }
     
@@ -182,8 +181,8 @@ process.on('SIGTERM', async () => {
     await emailSyncService.stopSync();
   }
   
-  if (elasticsearchService) {
-    await elasticsearchService.close();
+  if (imapEmailService) {
+    await imapEmailService.close();
   }
   
   process.exit(0);
@@ -201,8 +200,8 @@ process.on('SIGINT', async () => {
     await emailSyncService.stopSync();
   }
   
-  if (elasticsearchService) {
-    await elasticsearchService.close();
+  if (imapEmailService) {
+    await imapEmailService.close();
   }
   
   process.exit(0);
@@ -243,4 +242,4 @@ async function startServer() {
 
 startServer();
 
-export { app, elasticsearchService, emailSyncService, slackService, webhookService, aiCategorizeService };
+export { app, imapEmailService, emailSyncService, slackService, webhookService, aiCategorizeService };

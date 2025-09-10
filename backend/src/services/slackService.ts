@@ -13,10 +13,17 @@ export class SlackService {
     this.isEnabled = !!(token && this.channelId);
 
     if (this.isEnabled && token) {
-      this.client = new WebClient(token);
-      logger.info('Slack service initialized');
+      try {
+        this.client = new WebClient(token);
+        logger.info('Slack service initialized');
+      } catch (error) {
+        logger.error('Failed to initialize Slack service:', error);
+        this.isEnabled = false;
+        this.client = undefined;
+      }
     } else {
       logger.warn('Slack service disabled - missing SLACK_BOT_TOKEN or SLACK_CHANNEL_ID');
+      this.isEnabled = false;
     }
   }
 

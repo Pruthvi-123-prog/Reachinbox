@@ -1,7 +1,7 @@
 import { Router, Request, Response } from 'express';
 import { asyncHandler } from '../utils/errorHandler';
 import { logger } from '../utils/logger';
-import { ElasticsearchService } from '../services/elasticsearchService';
+import { ImapEmailService } from '../services/imapEmailService';
 
 const router = Router();
 
@@ -20,7 +20,7 @@ router.get('/trends', asyncHandler(async (req: Request, res: Response) => {
   
   try {
     // Get services from the main app instance
-    const { elasticsearchService } = require('../index');
+    const { imapEmailService } = require('../index');
     
     // Define the date range based on the period parameter
     const now = new Date();
@@ -49,8 +49,8 @@ router.get('/trends', asyncHandler(async (req: Request, res: Response) => {
       }
     }
     
-    // Get email analytics from Elasticsearch
-    const analyticsData = await elasticsearchService.getEmailAnalytics({
+    // Get email analytics from IMAP service
+    const analyticsData = await imapEmailService.getEmailAnalytics({
       dateFrom: fromDate,
       dateTo: now,
       account: account as string | undefined,
@@ -58,7 +58,7 @@ router.get('/trends', asyncHandler(async (req: Request, res: Response) => {
     });
     
     // Calculate daily trends
-    const dailyTrends = await elasticsearchService.getEmailVolumeByDay({
+    const dailyTrends = await imapEmailService.getEmailVolumeByDay({
       dateFrom: fromDate,
       dateTo: now,
       account: account as string | undefined,
@@ -66,7 +66,7 @@ router.get('/trends', asyncHandler(async (req: Request, res: Response) => {
     });
     
     // Calculate hourly distribution
-    const hourlyDistribution = await elasticsearchService.getEmailVolumeByHour({
+    const hourlyDistribution = await imapEmailService.getEmailVolumeByHour({
       dateFrom: fromDate,
       dateTo: now,
       account: account as string | undefined,
@@ -74,14 +74,14 @@ router.get('/trends', asyncHandler(async (req: Request, res: Response) => {
     });
     
     // Calculate category distribution over time
-    const categoryTrends = await elasticsearchService.getCategoryTrends({
+    const categoryTrends = await imapEmailService.getCategoryTrends({
       dateFrom: fromDate,
       dateTo: now,
       account: account as string | undefined
     });
     
     // Calculate response time metrics
-    const responseTimeMetrics = await elasticsearchService.getResponseTimeMetrics({
+    const responseTimeMetrics = await imapEmailService.getResponseTimeMetrics({
       dateFrom: fromDate,
       dateTo: now,
       account: account as string | undefined
@@ -130,9 +130,9 @@ router.get('/volume/daily', asyncHandler(async (req: Request, res: Response) => 
   
   try {
     // Get services from the main app instance
-    const { elasticsearchService } = require('../index');
+    const { imapEmailService } = require('../index');
     
-    const dailyVolume = await elasticsearchService.getEmailVolumeByDay({
+    const dailyVolume = await imapEmailService.getEmailVolumeByDay({
       dateFrom: dateFrom ? new Date(dateFrom as string) : undefined,
       dateTo: dateTo ? new Date(dateTo as string) : undefined,
       account: account as string | undefined,
@@ -162,9 +162,9 @@ router.get('/volume/hourly', asyncHandler(async (req: Request, res: Response) =>
   
   try {
     // Get services from the main app instance
-    const { elasticsearchService } = require('../index');
+    const { imapEmailService } = require('../index');
     
-    const hourlyVolume = await elasticsearchService.getEmailVolumeByHour({
+    const hourlyVolume = await imapEmailService.getEmailVolumeByHour({
       dateFrom: dateFrom ? new Date(dateFrom as string) : undefined,
       dateTo: dateTo ? new Date(dateTo as string) : undefined,
       account: account as string | undefined,
@@ -194,9 +194,9 @@ router.get('/trends/categories', asyncHandler(async (req: Request, res: Response
   
   try {
     // Get services from the main app instance
-    const { elasticsearchService } = require('../index');
+    const { imapEmailService } = require('../index');
     
-    const categoryTrends = await elasticsearchService.getCategoryTrends({
+    const categoryTrends = await imapEmailService.getCategoryTrends({
       dateFrom: dateFrom ? new Date(dateFrom as string) : undefined,
       dateTo: dateTo ? new Date(dateTo as string) : undefined,
       account: account as string | undefined
@@ -225,9 +225,9 @@ router.get('/metrics/response-time', asyncHandler(async (req: Request, res: Resp
   
   try {
     // Get services from the main app instance
-    const { elasticsearchService } = require('../index');
+    const { imapEmailService } = require('../index');
     
-    const responseTimeMetrics = await elasticsearchService.getResponseTimeMetrics({
+    const responseTimeMetrics = await imapEmailService.getResponseTimeMetrics({
       dateFrom: dateFrom ? new Date(dateFrom as string) : undefined,
       dateTo: dateTo ? new Date(dateTo as string) : undefined,
       account: account as string | undefined
@@ -256,7 +256,7 @@ router.get('/dashboard', asyncHandler(async (req: Request, res: Response) => {
   
   try {
     // Get services from the main app instance
-    const { elasticsearchService } = require('../index');
+    const { imapEmailService } = require('../index');
     
     // Define default date range if not provided
     const now = new Date();
@@ -268,35 +268,35 @@ router.get('/dashboard', asyncHandler(async (req: Request, res: Response) => {
     // gather all the necessary analytics data from existing methods
     
     // Get email analytics
-    const analyticsData = await elasticsearchService.getEmailAnalytics({
+    const analyticsData = await imapEmailService.getEmailAnalytics({
       dateFrom: fromDate,
       dateTo: toDate,
       account: account as string | undefined
     });
     
     // Calculate daily trends
-    const dailyTrends = await elasticsearchService.getEmailVolumeByDay({
+    const dailyTrends = await imapEmailService.getEmailVolumeByDay({
       dateFrom: fromDate,
       dateTo: toDate,
       account: account as string | undefined
     });
     
     // Calculate hourly distribution
-    const hourlyDistribution = await elasticsearchService.getEmailVolumeByHour({
+    const hourlyDistribution = await imapEmailService.getEmailVolumeByHour({
       dateFrom: fromDate,
       dateTo: toDate,
       account: account as string | undefined
     });
     
     // Calculate category distribution over time
-    const categoryTrends = await elasticsearchService.getCategoryTrends({
+    const categoryTrends = await imapEmailService.getCategoryTrends({
       dateFrom: fromDate,
       dateTo: toDate,
       account: account as string | undefined
     });
     
     // Calculate response time metrics
-    const responseTimeMetrics = await elasticsearchService.getResponseTimeMetrics({
+    const responseTimeMetrics = await imapEmailService.getResponseTimeMetrics({
       dateFrom: fromDate,
       dateTo: toDate,
       account: account as string | undefined

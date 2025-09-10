@@ -15,9 +15,18 @@ export class WebhookService {
     this.retryAttempts = 3;
 
     if (this.isEnabled) {
-      logger.info(`Webhook service initialized with URL: ${this.maskUrl(this.webhookUrl)}`);
+      try {
+        // Validate URL format
+        new URL(this.webhookUrl);
+        logger.info(`Webhook service initialized with URL: ${this.maskUrl(this.webhookUrl)}`);
+      } catch (error) {
+        logger.error('Invalid webhook URL format:', error);
+        this.isEnabled = false;
+        this.webhookUrl = '';
+      }
     } else {
       logger.warn('Webhook service disabled - missing WEBHOOK_URL');
+      this.isEnabled = false;
     }
   }
 

@@ -36,35 +36,30 @@ router.get('/', healthCors, asyncHandler(async (req: Request, res: Response) => 
   res.status(200).json(healthStatus);
 }));
 
-// Debug endpoint for Elasticsearch connectivity
-router.get('/elasticsearch-debug', healthCors, asyncHandler(async (req: Request, res: Response) => {
-  const { elasticsearchService } = require('../index');
+// Debug endpoint for IMAP service connectivity
+router.get('/imap-debug', healthCors, asyncHandler(async (req: Request, res: Response) => {
+  const { imapEmailService } = require('../index');
   const debugInfo: any = {
     timestamp: new Date().toISOString(),
-    elasticsearchAvailable: elasticsearchService ? elasticsearchService.isAvailable : false,
-    elasticsearchHost: process.env.ELASTICSEARCH_HOST || process.env.ELASTICSEARCH_URL || 'http://elasticsearch:9200',
-    indexName: elasticsearchService ? elasticsearchService.indexName : 'unknown',
+    imapServiceAvailable: imapEmailService ? imapEmailService.isInitialized : false,
     environmentVars: {
-      ELASTICSEARCH_HOST: process.env.ELASTICSEARCH_HOST,
-      ELASTICSEARCH_URL: process.env.ELASTICSEARCH_URL,
-      ELASTICSEARCH_INDEX_PREFIX: process.env.ELASTICSEARCH_INDEX_PREFIX
+      IMAP1_HOST: process.env.IMAP1_HOST,
+      IMAP1_USER: process.env.IMAP1_USER ? '***configured***' : 'not set',
+      IMAP2_HOST: process.env.IMAP2_HOST,
+      IMAP2_USER: process.env.IMAP2_USER ? '***configured***' : 'not set'
     }
   };
   
   try {
-    if (elasticsearchService) {
-      try {
-        const pingResult = await elasticsearchService.client.ping({ requestTimeout: 5000 });
-        debugInfo.pingResult = pingResult;
-        debugInfo.pingStatus = 'success';
-      } catch (pingError: any) {
-        debugInfo.pingStatus = 'error';
-        debugInfo.pingError = {
-          message: pingError.message,
-          code: pingError.code,
-          stack: pingError.stack
-        };
-      }
+    if (imapEmailService) {
+      const status = imapEmailService.getStatus();
+      debugInfo.imapStatus = status;
+      debugInfo.pingStatus = 'success';
+    } else {
+      debugInfo.pingStatus = 'error';
+      debugInfo.pingError = {
+        message: 'IMAP service not initialized'
+      };
     }
   } catch (err: any) {
     debugInfo.error = {
@@ -101,44 +96,34 @@ router.get('/detailed', healthCors, asyncHandler(async (req: Request, res: Respo
     // Add system check immediately
     checks.system = { status: 'healthy', message: 'API server is running' };
     
-    // Check Elasticsearch connection with a racing promise
-    const { elasticsearchService } = require('../index');
-    if (elasticsearchService) {
+    // Check IMAP service connection
+    const { imapEmailService } = require('../index');
+    if (imapEmailService) {
       try {
-        // Create a racing promise that resolves or rejects after 1 second
-        let timeoutId;
-        const pingPromise = elasticsearchService.client.ping();
-        const timeoutPromise = new Promise((_, reject) => {
-          timeoutId = setTimeout(() => {
-            reject(new Error('Elasticsearch ping timed out after 1 second'));
-          }, 1000);
-        });
-        
-        try {
-          // Race the promises
-          await Promise.race([pingPromise, timeoutPromise]);
-          // Clear timeout if ping succeeds
-          clearTimeout(timeoutId);
-          checks.elasticsearch = { status: 'healthy', message: 'Connected' };
-        } catch (error: any) {
-          // Don't fail the whole health check just because Elasticsearch is down
-          checks.elasticsearch = { 
+        const status = imapEmailService.getStatus();
+        if (status.isInitialized && status.connectedAccounts > 0) {
+          checks.imapService = { 
+            status: 'healthy', 
+            message: `Connected to ${status.connectedAccounts} accounts`,
+            totalEmails: status.totalEmails
+          };
+        } else {
+          checks.imapService = { 
             status: 'degraded', 
-            message: `Not connected: ${error.message}`,
+            message: 'Service initialized but no accounts connected',
             fallbackEnabled: true
           };
-          logger.warn(`Health check: Elasticsearch connection failed: ${error.message}`);
         }
       } catch (error: any) {
-        checks.elasticsearch = { 
+        checks.imapService = { 
           status: 'degraded', 
-          message: `Error checking Elasticsearch: ${error.message}`,
+          message: `Error checking IMAP service: ${error.message}`,
           fallbackEnabled: true
         };
         logger.warn(`Health check error: ${error.message}`);
       }
     } else {
-      checks.elasticsearch = { 
+      checks.imapService = { 
         status: 'unknown', 
         message: 'Service not initialized',
         fallbackEnabled: true 
@@ -188,6 +173,20 @@ router.get('/detailed', healthCors, asyncHandler(async (req: Request, res: Respo
       };
     } else {
       checks.webhook = { status: 'unknown', message: 'Service not initialized' };
+    }
+
+    // Check AI Categorization service
+    const { aiCategorizeService } = require('../index');
+    if (aiCategorizeService) {
+      const aiStatus = aiCategorizeService.getStatus();
+      checks.aiCategorization = {
+        status: aiStatus.enabled ? 'healthy' : 'fallback',
+        provider: aiStatus.provider,
+        model: aiStatus.model,
+        fallbackAvailable: aiStatus.fallbackAvailable
+      };
+    } else {
+      checks.aiCategorization = { status: 'unknown', message: 'Service not initialized' };
     }
 
     // Overall health status - more nuanced check
@@ -255,56 +254,37 @@ router.get('/detailed', healthCors, asyncHandler(async (req: Request, res: Respo
 // Readiness probe (for Kubernetes/Docker)
 router.get('/ready', asyncHandler(async (req: Request, res: Response) => {
   try {
-    const { elasticsearchService, emailSyncService } = require('../index');
+    const { imapEmailService, emailSyncService } = require('../index');
     
     // Check if minimal requirements are met to serve requests
-    const esStatus = { ready: false, optional: true };
+    const imapStatus = { ready: false, optional: false };
     const syncStatus = { ready: false, optional: false };
     
-    // Elasticsearch is optional - we can fall back to mock behavior
-    if (elasticsearchService) {
+    // IMAP service is required for email functionality
+    if (imapEmailService) {
       try {
-        // Quick timeout for readiness checks
-        let timeoutId;
-        const pingPromise = elasticsearchService.client.ping();
-        const timeoutPromise = new Promise((_, reject) => {
-          timeoutId = setTimeout(() => {
-            reject(new Error('timeout'));
-          }, 1000);
-        });
-        
-        try {
-          await Promise.race([pingPromise, timeoutPromise]);
-          // Clear timeout if ping succeeds
-          clearTimeout(timeoutId);
-          esStatus.ready = true;
-        } catch (err) {
-          // Elasticsearch is down but that's okay if we have fallbacks
-          esStatus.ready = false;
-          logger.info('Elasticsearch not ready, but continuing with fallback');
-        }
+        const status = imapEmailService.getStatus();
+        imapStatus.ready = status.isInitialized && status.connectedAccounts > 0;
       } catch (err) {
-        // Error in the check itself
-        esStatus.ready = false;
-        logger.info(`Error checking Elasticsearch readiness: ${err}`);
+        imapStatus.ready = false;
+        logger.info(`Error checking IMAP service readiness: ${err}`);
       }
     }
     
     // Email sync is required
     if (emailSyncService) {
       const status = emailSyncService.getStatus();
-      syncStatus.ready = status.isInitialized || status.isRunning;
+      syncStatus.ready = status.isRunning;
     }
     
     // We're ready if required services are ready
-    // and optional services are either ready or marked as optional
-    const isReady = syncStatus.ready && (esStatus.ready || esStatus.optional);
+    const isReady = imapStatus.ready && syncStatus.ready;
     
     if (isReady) {
       res.status(200).json({ 
         status: 'ready', 
         timestamp: new Date().toISOString(),
-        elasticsearch: esStatus.ready ? 'ready' : 'bypassed (optional)',
+        imapService: imapStatus.ready ? 'ready' : 'not ready',
         emailSync: syncStatus.ready ? 'ready' : 'not ready'
       });
     } else {
@@ -312,7 +292,7 @@ router.get('/ready', asyncHandler(async (req: Request, res: Response) => {
         status: 'ready with limitations', 
         timestamp: new Date().toISOString(),
         message: 'Service is ready but some features may be limited',
-        elasticsearch: esStatus.ready ? 'ready' : 'bypassed (optional)',
+        imapService: imapStatus.ready ? 'ready' : 'not ready',
         emailSync: syncStatus.ready ? 'ready' : 'not ready'
       });
     }
