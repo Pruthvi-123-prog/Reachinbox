@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # IMAP Email Management Application
 
 [![TypeScript](https://img.shields.io/badge/TypeScript-4.9.5-blue.svg)](https://www.typescriptlang.org/)
@@ -362,4 +361,3 @@ Licensed under the [MIT License](LICENSE).
 Backend-focused application for scalable email synchronization and analytics.
 =======
 # IMAP
->>>>>>> 44ed6ea33fadf3dd9a0610398e84c280a1f65e64
