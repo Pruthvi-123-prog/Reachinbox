@@ -30,7 +30,7 @@ export async function fetchGroqModels(): Promise<string[]> {
   try {
     // Make sure we're hitting the backend server (port 3000), not the frontend server (port 3002)
     // Use the full URL to avoid any confusion
-    const backendUrl = `${(window as any).REACHINBOX_CONFIG?.API_URL || process.env.REACT_APP_API_URL || 'http://localhost:3000'}/api/groq-proxy/models`;
+    const backendUrl = `${(window as any).REACHINBOX_CONFIG?.API_URL || process.env.REACT_APP_API_URL || 'https://reachinbox-8bd8.onrender.com'}/api/groq-proxy/models`;
     console.log('Fetching Groq models from:', backendUrl);
     
     const response = await axios.get(backendUrl, {
@@ -120,7 +120,7 @@ export async function generateEmailReply(emailContent: string): Promise<{ subjec
     console.log(`Making API call to Groq through backend proxy with model ${modelToUse}`);
     
     // Use the full backend URL to avoid confusion
-    const backendUrl = `${(window as any).REACHINBOX_CONFIG?.API_URL || process.env.REACT_APP_API_URL || 'http://localhost:3000'}/api/groq-proxy/chat`;
+    const backendUrl = `${(window as any).REACHINBOX_CONFIG?.API_URL || process.env.REACT_APP_API_URL || 'https://reachinbox-8bd8.onrender.com'}/api/groq-proxy/chat`;
     console.log('Sending request to:', backendUrl);
     
     const response = await axios.post(backendUrl, {
@@ -176,7 +176,7 @@ export async function generateEmailReply(emailContent: string): Promise<{ subjec
         try {
           // Make a new request with the fallback model
           // Use the full backend URL to avoid confusion
-          const backendUrl = `${(window as any).REACHINBOX_CONFIG?.API_URL || process.env.REACT_APP_API_URL || 'http://localhost:3000'}/api/groq-proxy/chat`;
+          const backendUrl = `${(window as any).REACHINBOX_CONFIG?.API_URL || process.env.REACT_APP_API_URL || 'https://reachinbox-8bd8.onrender.com'}/api/groq-proxy/chat`;
           console.log('Sending fallback request to:', backendUrl);
           
           const fallbackResponse = await axios.post(backendUrl, {
