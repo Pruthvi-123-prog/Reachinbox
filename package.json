@@ -1,0 +1,16 @@
+{
+  "name": "reachinbox-fullstack",
+  "version": "1.0.0",
+  "description": "Full-stack ReachInbox application for Vercel deployment",
+  "scripts": {
+    "build": "cd backend && npm run build && cd ../frontend && npm run build",
+    "dev": "concurrently \"cd backend && npm run dev\" \"cd frontend && npm start\"",
+    "install-all": "cd backend && npm install && cd ../frontend && npm install"
+  },
+  "devDependencies": {
+    "concurrently": "^7.6.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

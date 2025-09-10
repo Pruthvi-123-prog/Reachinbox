@@ -11,7 +11,7 @@ console.log('\n✨ =================================');
 console.log('✨ DIGANTHADEEPA EMAIL APP STARTED');
 console.log('✨ =================================');
 console.log(`✨ Frontend Port: ${window.location.port || '3000 (default)'}`);
-console.log(`✨ API Base URL: ${(window as any).REACHINBOX_CONFIG?.API_URL || process.env.REACT_APP_API_URL || 'https://reachinbox-8bd8.onrender.com'}`);
+console.log(`✨ API Base URL: ${(window as any).REACHINBOX_CONFIG?.API_URL || process.env.REACT_APP_API_URL || '/api'}`);
 console.log(`✨ Environment: ${process.env.NODE_ENV || 'development'}`);
 console.log(`✨ React Version: ${React.version}`);
 console.log('✨ =================================\n');

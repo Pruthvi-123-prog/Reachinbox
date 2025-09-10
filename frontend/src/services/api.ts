@@ -134,7 +134,7 @@ Instructions:
 
 // Create axios instance with base configuration
 const api = axios.create({
-  baseURL: (window as any).REACHINBOX_CONFIG?.API_URL || process.env.REACT_APP_API_URL || 'https://reachinbox-8bd8.onrender.com',
+  baseURL: (window as any).REACHINBOX_CONFIG?.API_URL || process.env.REACT_APP_API_URL || '/api',
   timeout: 30000,
   headers: {
     'Content-Type': 'application/json',
